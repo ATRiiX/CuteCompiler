@@ -7,7 +7,7 @@
 #define TOKEN(t) ( yylval.token = t)
 
 static FILE* yyparse_file_ptr;
-
+//static void comment(void);
 // void yyparse_init(const char* filename)
 // {
 // 	yyparse_file_ptr = fopen(filename, "r");
@@ -24,6 +24,7 @@ static FILE* yyparse_file_ptr;
 %option noyywrap
 
 %%
+
 "//".*                                    { /* consume //-comment */ }
 "#".*                   ;
 [ \t\r\n]				;
