@@ -1,0 +1,9 @@
+extern int printf(string str)
+extern int puts(string str)
+//this is a comment
+#this is a comment
+int main(){
+    int i =0
+    error()
+    return 0
+}
