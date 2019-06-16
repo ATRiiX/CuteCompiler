@@ -24,6 +24,7 @@ static FILE* yyparse_file_ptr;
 %option noyywrap
 
 %%
+"//".*                                    { /* consume //-comment */ }
 "#".*                   ;
 [ \t\r\n]				;
 "if"                    puts("TIF"); return TOKEN(TIF);
