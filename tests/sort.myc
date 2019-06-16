@@ -1,0 +1,29 @@
+extern int printf(string str)
+extern int puts(string str)
+
+int main(){
+
+    int[13] arr = [ 15,5,1,6,9,8,3,4,6,10,7,11 ]
+
+    int i
+    int j
+    int temp
+    for(i=0; i<12; i=i+1){
+    	for(j=i; j<12; j=j+1){
+            if (arr[i]>arr[j]){
+            temp=arr[j]
+            arr[j]=arr[i]
+            arr[i]=temp
+            }
+        }
+    }
+
+    for(i=0; i<12; i=i+1){
+            printf("%d", arr[i])
+        
+        puts("")
+    }
+    
+    
+    return 0
+}
