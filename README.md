@@ -2,7 +2,7 @@
 
 
 
-
+```js
 sudo apt-get install libjsoncpp-dev build-essential zlib1g-dev libssl-dev libsqlite3-dev libbz2-dev libreadline-dev           
 sudo ln -s /usr/include/jsoncpp/json/ /usr/include/json          
 sudo apt-get install libncurses-dev build-essential linux-headers-`uname -r` flex bison llvm-3.9          
@@ -38,7 +38,7 @@ g++ -c `llvm-config-3.9 --cppflags` -std=c++11 -o ObjGen.o ObjGen.cpp
 g++ -c `llvm-config-3.9 --cppflags` -std=c++11 -o TypeSystem.o TypeSystem.cpp          
 g++ `llvm-config-3.9 --cppflags` -std=c++11 -o compiler grammar.o token.o CodeGen.o utils.o main.o ObjGen.o TypeSystem.o  `llvm-config-3.9 --libs` `llvm-config-3.9 --ldflags` -lpthread -ldl -lz -lncurses -rdynamic -L/usr/local/lib -ljsoncpp          
 
-
+```
 
 
 
