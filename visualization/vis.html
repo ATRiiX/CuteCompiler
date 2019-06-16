@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiger Compiler Visualization - Compiler </title>
+    
+    <script src="https://cdn.bootcss.com/d3/3.2.2/d3.v3.js"></script>    
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+          
+    <style>
+        .node {
+            cursor: pointer;
+        }
+
+        .node text {
+            font: 10px sans-serif;
+        }
+
+        .link {
+            fill: none;
+            stroke: #2bbbad;
+            stroke-width: 1px;
+        }
+        #svg {
+            width: -webkit-fill-available;
+            height: -webkit-fill-available;
+        }
+        svg {
+            cursor: move;
+            margin-top: 10px;
+            border: 1px solid #2bbbad;
+        }
+        .custom-form .btn {
+            height: 1.5rem;
+            line-height: 1.5rem;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        .custom-form label{
+            top: 0;
+            color: white;
+            position: static;
+            cursor: pointer;
+        }
+        .custom-form .file-field input.file-path {
+            height: 1.2rem;
+            margin: 0;
+        }
+        .custom-form .file-path-wrapper {
+            float: left;
+            width: 40%;
+        }
+        .custom-form span {
+            cursor: default;
+        }
+        .copyright {
+            font-size: 14px;
+            line-height: 22px;
+            color:#999;
+            float: right;
+            margin-right: 20px;
+        }
+        .title {
+            float: left;
+            margin-left: 20px;
+            font: 18px sans-serif;
+            height: 20px;
+            line-height: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <form class="custom-form" action="#">
+        <div class="file-field input-field">
+            <label class="btn" for="fileinput">
+                <span>选择文件</span>
+                <input type="file" id="fileinput">
+            </label>
+            <div class='btn' onclick='loadFile();'>生成</div>
+            <div class='btn' onclick='show()'>刷新</div>
+            <div class="file-path-wrapper">
+                <input class="file-path validate" type="text">
+            </div>
+            <span class="title">Compiler Visualization</span>
+            <span class="copyright">©2019 张思淡 林奇恒 吴涵杰</span>
+        </div>
+      </form>
+    <div id="svg"></div>
+    <script type='text/javascript'>
+        var _root = [];
+        function loadFile() {
+            var input, file, fr;
+            if (typeof window.FileReader !== 'function') {
+                $(body).append("p", "The file API isn't supported on this browser yet.");
+                return;
+            }
+
+            input = document.getElementById('fileinput');
+            if (!input) {
+                $(body).append("p", "出错啦");
+            }
+            else if (!input.files) {
+                $(body).append("p", "浏览器不支持文件上传");
+            }
+            else if (!input.files[0]) {
+                $(body).append("p", "请选择文件");
+            }
+            else {
+                file = input.files[0];
+                if (file.name.indexOf(".json") == -1) {
+                    alert("请选择json文件");
+                    return false;
+                }
+                if (file) {
+                    var reader = new FileReader();
+                    reader.readAsText(file, "UTF-8");
+                    reader.onload = function (evt) {
+                        _root = JSON.parse(evt.target.result);
+                        show(_root);
+                    }
+                    reader.onerror = function (evt) {
+                        console.log(evt);
+                    }
+                }
+            }
+        }
+        function show(root = _root){
+            var margin = {
+                top: 20,
+                right: 120,
+                bottom: 20,
+                left: 120
+            };
+            width = window.innerWidth - margin.right - margin.left,
+            height = window.innerHeight - margin.top - margin.bottom;
+            var cluster = d3.layout.cluster().size([height, width - 100]);
+            var i = 0,
+                duration = 750,
+                rectW = 60,
+                rectH = 30;
+            var tree = d3.layout.tree().nodeSize([100, 40]);
+            var diagonal = d3.svg.diagonal()
+                .projection(function (d) {
+                    return [d.x + rectW / 2, d.y + rectH / 2];
+                });
+            var wid = d3.select('#svg').style("width");
+            var hei = d3.select('#svg').style('height');
+            var svg = d3.select("#svg")
+                        .html("")
+                        .append("svg")
+                        .attr("width", wid)
+                        .attr("height", hei)
+                        .call(zm = d3.behavior
+                                    .zoom()
+                                    .scaleExtent([0.5, 6])
+                                    .on("zoom", zoomed)
+                        ).append("g")
+                        .attr("transform", "translate(" + (width/2+margin.left) + "," + 20 + ")");
+    
+            //necessary so that zoom knows where to zoom and unzoom from
+            zm.translate([width/2+margin.left, 20]);
+
+            root.x0 = 0;
+            root.y0 = height / 2;
+            function collapse(d) {
+                if (d.children) {
+                    d._children = d.children;
+                    d._children.forEach(collapse);
+                    d.children = null;
+                }
+            }
+            //root.children.forEach(collapse);
+            update(root);
+            d3.select("#svg").style("height", hei);
+            function update(source) {
+                // Compute the new tree layout.
+                var nodes = tree.nodes(root).reverse(),
+                    links = tree.links(nodes);
+                // Normalize for fixed-depth.
+                nodes.forEach(function (d) {
+                    d.y = d.depth * 60;
+                });
+
+                // Update the nodes…
+                var node = svg.selectAll("g.node")
+                    .data(nodes, function (d) {
+                        return d.id || (d.id = ++i);
+                    });
+
+                // Enter any new nodes at the parent's previous position.
+                var nodeEnter = node.enter().append("g")
+                    .attr("class", "node")
+                    .attr("transform", function (d) {
+                        return "translate(" + source.x0 + "," + source.y0 + ")";
+                    })
+                    .on("click", click);
+
+                var rect = nodeEnter.append("rect")
+                    .style("width", rectW)
+                    .style("height", rectH)
+                    .attr("stroke", "#2bbbad")
+                    .attr("stroke-width", 1)
+                    .style("fill", function (d) {
+                        return d._children ? "#2bbbad" : "#fff";
+                    });
+
+                var text = nodeEnter.append("text")
+                    .attr("x", rectW / 2)
+                    .attr("y", rectH / 2)
+                    .attr("dy", ".35em")
+                    .attr("text-anchor", "middle")
+                    .text(function (d) {
+                        return d.name;
+                    });
+                // Transition nodes to their new position.
+                var nodeUpdate = node.transition()
+                    .duration(duration)
+                    .attr("transform", function (d) {
+                        return "translate(" + d.x + "," + d.y + ")";
+                    });
+
+                nodeUpdate.select("rect")
+                    .style("width", rectW)
+                    .style("height", rectH)
+                    .attr("stroke", "#2bbbad")
+                    .attr("stroke-width", 1)
+                    .style("fill", function (d) {
+                        return d._children ? "#2bbbad" : "#fff";
+                    });
+
+                nodeUpdate.select("text")
+                    .style("fill-opacity", 1);
+
+                // Transition exiting nodes to the parent's new position.
+                var nodeExit = node.exit().transition()
+                    .duration(duration)
+                    .attr("transform", function (d) {
+                        return "translate(" + source.x + "," + source.y + ")";
+                    })
+                    .remove();
+
+                nodeExit.select("rect")
+                    .attr("width", rectW)
+                    .attr("height", rectH)
+                    .attr("stroke", "#2bbbad")
+                    .attr("stroke-width", 1);
+
+                nodeExit.select("text");
+
+                // Update the links…
+                var link = svg.selectAll("path.link")
+                    .data(links, function (d) {
+                        return d.target.id;
+                    });
+
+                // Enter any new links at the parent's previous position.
+                link.enter().insert("path", "g")
+                    .attr("class", "link")
+                    .attr("x", rectW / 2)
+                    .attr("y", rectH / 2)
+                    .attr("d", function (d) {
+                        var o = {
+                            x: source.x0,
+                            y: source.y0
+                        };
+                        return diagonal({
+                            source: o,
+                            target: o
+                        });
+                    });
+
+                // Transition links to their new position.
+                link.transition()
+                    .duration(duration)
+                    .attr("d", diagonal);
+
+                // Transition exiting nodes to the parent's new position.
+                link.exit().transition()
+                    .duration(duration)
+                    .attr("d", function (d) {
+                        var o = {
+                            x: source.x,
+                            y: source.y
+                        };
+                        return diagonal({
+                            source: o,
+                            target: o
+                        });
+                    })
+                    .remove();
+
+                // Stash the old positions for transition.
+                nodes.forEach(function (d) {
+                    d.x0 = d.x;
+                    d.y0 = d.y;
+                });
+            }
+
+            // Toggle children on .
+            function click(d) {
+                if (d.children) {
+                    d._children = d.children;
+                    d.children = null;
+                } else {
+                    d.children = d._children;
+                    d._children = null;
+                }
+                update(d);
+            }
+            function zoomed() {
+                svg.attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
+            }
+        }
+        
+    </script>
+</body>
+
+</html>
