@@ -27,7 +27,9 @@ cat tests/Array.myc | ./compiler
 clang++  output.o -o test          
 ./test         
 
-       
+cat tests/Fibonacci.myc | ./compiler          
+clang++  output.o -o test          
+./test       
 
         
 cat tests/inputtest.myc | ./compiler          
@@ -35,9 +37,7 @@ clang++  output.o -o test
 ./test          
 
 
-cat tests/Fibonacci.myc | ./compiler          
-clang++  output.o -o test          
-./test  
+
 
 ```
 
