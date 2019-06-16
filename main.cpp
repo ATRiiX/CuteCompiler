@@ -17,8 +17,8 @@ extern int yyparse();
 
 using namespace std;
 
-extern int yyparse();
-extern NBlock* programBlock;
+//extern int yyparse();
+//extern NBlock* programBlock;
 
 int main(int argc, char **argv) {
     yyparse();

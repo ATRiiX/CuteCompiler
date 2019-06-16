@@ -24,7 +24,7 @@ g++ `llvm-config-3.9 --cppflags` -std=c++11 -o compiler grammar.o token.o CodeGe
 
 ```
 
-我们的编译器支持Python的#单行注释和//单行注释
+我们的编译器支持#单行注释和//单行注释
 
 目前不支持多行注释   
 
