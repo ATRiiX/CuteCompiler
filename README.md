@@ -26,7 +26,7 @@ clang++  output.o -o test
 
 
 
-yacc -d grammar.y   #Éú³É   y.tab.c              
+yacc -d grammar.y   #ç”Ÿæˆ   y.tab.c              
 bison -d -o grammar.cpp grammar.y          
 g++ -c `llvm-config-3.9 --cppflags` -std=c++11 -o grammar.o grammar.cpp          
 flex -o token.cpp token.l          
