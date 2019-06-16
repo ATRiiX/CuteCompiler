@@ -26,6 +26,9 @@ g++ `llvm-config-3.9 --cppflags` -std=c++11 -o compiler grammar.o token.o CodeGe
 
 我们的编译器支持Python的#单行注释和//单行注释
 
+目前不支持多行注释   
+
+
 ```js 
 cat tests/Array.myc | ./compiler          
 clang++  output.o -o test          
@@ -39,7 +42,6 @@ clang++  output.o -o test
 cat tests/inputtest.myc | ./compiler          
 clang++  output.o -o test          
 ./test          
-
 
 
 
