@@ -11,9 +11,9 @@ extern int yyparse();
 //
 //void createCoreFunctions(CodeGenContext& context);
 
-#include <iostream>
-#include "CodeGen.h"
-#include "ASTNodes.h"
+//#include <iostream>
+//#include "CodeGen.h"
+//#include "ASTNodes.h"
 
 using namespace std;
 
