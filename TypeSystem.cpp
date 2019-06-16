@@ -1,7 +1,3 @@
-//
-// Created by cs on 2017/5/31.
-//
-
 #include "TypeSystem.h"
 #include "CodeGen.h"
 //

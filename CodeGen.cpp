@@ -1,6 +1,3 @@
-//
-// Created by cs on 2017/5/28.
-//
 
 #include <llvm/IR/Value.h>
 #include <llvm/IR/LLVMContext.h>

@@ -1,6 +1,3 @@
-//
-// Created by cs on 2017/5/30.
-//
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Host.h>
 #include <llvm/Support/raw_ostream.h>

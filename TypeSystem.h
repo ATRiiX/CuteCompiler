@@ -1,7 +1,3 @@
-//
-// Created by cs on 2017/5/31.
-//
-
 #ifndef TINYCOMPILER_TYPESYSTEM_H
 #define TINYCOMPILER_TYPESYSTEM_H
 
