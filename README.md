@@ -23,23 +23,21 @@ g++ -c `llvm-config-3.9 --cppflags` -std=c++11 -o TypeSystem.o TypeSystem.cpp
 g++ `llvm-config-3.9 --cppflags` -std=c++11 -o compiler grammar.o token.o CodeGen.o utils.o main.o ObjGen.o TypeSystem.o  `llvm-config-3.9 --libs` `llvm-config-3.9 --ldflags` -lpthread -ldl -lz -lncurses -rdynamic -L/usr/local/lib -ljsoncpp          
  
  
-cat tests/testArray.input | ./compiler          
+cat tests/Array.myc | ./compiler          
 clang++  output.o -o test          
 ./test         
 
-make test          
-clang++  output.o -o test          
-./test          
+       
 
         
-
-
-cat tests/testBasic.input | ./compiler          
+cat tests/inputtest.myc | ./compiler          
 clang++  output.o -o test          
 ./test          
 
 
-
+cat tests/Fibonacci.myc | ./compiler          
+clang++  output.o -o test          
+./test  
 
 ```
 
