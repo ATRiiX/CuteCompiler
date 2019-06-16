@@ -1,6 +1,6 @@
-#ifndef TINYCOMPILER_OBJGEN_H
-#define TINYCOMPILER_OBJGEN_H
+#ifndef CUTECOMPLIER_OBJGEN_H
+#define CUTECOMPLIER_OBJGEN_H
 
 void ObjGen(CodeGenContext & context, const string& filename = "output.o");
 
-#endif //TINYCOMPILER_OBJGEN_H
+#endif //CUTECOMPLIER_OBJGEN_H

@@ -1,5 +1,5 @@
-#ifndef TINYCOMPILER_TYPESYSTEM_H
-#define TINYCOMPILER_TYPESYSTEM_H
+#ifndef CUTECOMPLIER_TYPESYSTEM_H
+#define CUTECOMPLIER_TYPESYSTEM_H
 
 #include <llvm/IR/Type.h>
 #include <llvm/IR/Value.h>
@@ -109,4 +109,4 @@ public:
 };
 
 
-#endif //TINYCOMPILER_TYPESYSTEM_H
+#endif //CUTECOMPLIER_TYPESYSTEM_H
