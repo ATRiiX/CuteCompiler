@@ -28,10 +28,19 @@ g++ `llvm-config-3.9 --cppflags` -std=c++11 -o compiler grammar.o token.o CodeGe
 目前不支持多行注释   
 
 
+basic.myc是 if ,while, for的样例   
+sort.myc是选择排序的样例，   
+Fibonacci.myc是斐波那契递归调用的样例，   
+
+
 ```js 
-cat tests/Array.myc | ./compiler          
+cat tests/basic.myc | ./compiler          
 clang++  output.o -o test          
-./test         
+./test   
+
+cat tests/sort.myc | ./compiler          
+clang++  output.o -o test          
+./test     
 
 cat tests/Fibonacci.myc | ./compiler          
 clang++  output.o -o test          
@@ -42,14 +51,12 @@ cat tests/inputtest.myc | ./compiler
 clang++  output.o -o test          
 ./test          
 
-cat tests/sort.myc | ./compiler          
-clang++  output.o -o test          
-./test        
+   
 
-cat tests/basic.myc | ./compiler          
+ 
+cat tests/Array.myc | ./compiler          
 clang++  output.o -o test          
-./test    
-
+./test     
 ```
 
 
