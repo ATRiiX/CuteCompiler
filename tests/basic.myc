@@ -2,9 +2,6 @@ extern int printf(string str)
 extern int puts(string str)
 
 int main(){
-
-   
-
     int i =0
     int j =1
     if(i!=j){
@@ -15,11 +12,13 @@ int main(){
     }
 
 
-  printf("i is %d; j is %d ", i,j)
+  printf("i is %d ", i)
         
   puts("")
 
-    
+    printf("j is %d ", j)
+        
+  puts("")
     
     return 0
 }

@@ -46,6 +46,9 @@ cat tests/sort.myc | ./compiler
 clang++  output.o -o test          
 ./test        
 
+cat tests/basic.myc | ./compiler          
+clang++  output.o -o test          
+./test    
 
 ```
 
