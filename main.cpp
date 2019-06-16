@@ -11,6 +11,15 @@ extern int yyparse();
 //
 //void createCoreFunctions(CodeGenContext& context);
 
+#include <iostream>
+#include "CodeGen.h"
+#include "ASTNodes.h"
+
+using namespace std;
+
+extern int yyparse();
+extern NBlock* programBlock;
+
 int main(int argc, char **argv) {
     yyparse();
 
