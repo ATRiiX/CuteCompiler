@@ -11,9 +11,11 @@
 #include <string>
 #include <typeinfo>
 #include <regex>
+
+#include "json.hpp"
 //puts("$1"); return $1;
 using namespace std;
-
+using json = nlohmann::json;
 /*
 using std::cout;
 using std::endl;
@@ -50,6 +52,8 @@ public:
     virtual void print(string prefix) const {}
 
     virtual llvm::Value *codeGen(CodeGenContext &context) { return (llvm::Value *) 0; }
+
+  //  virtual json newjsonGen() const { return json(); }
 
     virtual Json::Value jsonGen() const { return Json::Value(); }
 };

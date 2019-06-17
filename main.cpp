@@ -3,7 +3,7 @@
 #include "ASTNodes2.h"
 #include "CodeGen.h"
 #include "ObjGen.h"
-
+#include "json.hpp"
 extern shared_ptr<NBlock> programBlock;
 extern int yyparse();
 // extern void yyparse_init(const char* filename);
@@ -16,7 +16,7 @@ extern int yyparse();
 //#include "ASTNodes2.h"
 
 using namespace std;
-
+using json = nlohmann::json;
 //extern int yyparse();
 //extern NBlock* programBlock;
 
