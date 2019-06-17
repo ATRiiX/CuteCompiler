@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include "ASTNodes.h"
+#include "ASTNodes2.h"
 #include "CodeGen.h"
 #include "ObjGen.h"
 
@@ -13,7 +13,7 @@ extern int yyparse();
 
 //#include <iostream>
 //#include "CodeGen.h"
-//#include "ASTNodes.h"
+//#include "ASTNodes2.h"
 
 using namespace std;
 

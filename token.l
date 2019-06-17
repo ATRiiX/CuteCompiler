@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 #include <string>
-#include "ASTNodes.h"
+#include "ASTNodes2.h"
 #include "grammar.hpp"
 #define SAVE_TOKEN yylval.string = new string(yytext)
 #define TOKEN(t) ( yylval.token = t)

@@ -1,5 +1,5 @@
 %{
-	#include "ASTNodes.h"
+	#include "ASTNodes2.h"
 	#include <stdio.h>
 	NBlock* programBlock;
 	extern int yylex();
@@ -68,7 +68,7 @@ primary_typename : TYINT { $$ = new NIdentifier(*$1); $$->isType = true;  delete
 					| TYVOID { $$ = new NIdentifier(*$1); $$->isType = true; delete $1; }
 					| TYSTRING { $$ = new NIdentifier(*$1); $$->isType = true; delete $1; }
 
-array_typename : primary_typename TLBRACKET TINTEGER TRBRACKET { 
+array_typename : primary_typename TLBRACKET TINTEGER TRBRACKET {
 					$1->isArray = true; 
 					$1->arraySize->push_back(make_shared<NInteger>(atol($3->c_str()))); 
 					$$ = $1; 

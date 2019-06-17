@@ -8,7 +8,7 @@
 #include <llvm/Support/raw_ostream.h>
 //#include <llvm/IR/Verifier.h>
 #include "CodeGen.h"
-#include "ASTNodes.h"
+#include "ASTNodes2.h"
 #include "TypeSystem.h"
 using legacy::PassManager;
 #define ISTYPE(value, id) (value->getType()->getTypeID() == id)
