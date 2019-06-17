@@ -13,6 +13,7 @@
 #include <regex>
 //puts("$1"); return $1;
 using namespace std;
+
 /*
 using std::cout;
 using std::endl;
@@ -164,7 +165,7 @@ public:
 
     NIdentifier(const std::string &name)
             : name(name) {
-                className = __func__;
+        className = __func__;
         // return "NIdentifier=" << name << endl;
     }
 
@@ -483,7 +484,7 @@ public:
     shared_ptr<NIdentifier> name;
     shared_ptr<VariableList> members = make_shared<VariableList>();
 
-    NStructDeclaration() {className = __func__;}
+    NStructDeclaration() { className = __func__; }
 
     NStructDeclaration(shared_ptr<NIdentifier> id, shared_ptr<VariableList> arguments)
             : name(id), members(arguments) {
@@ -751,7 +752,7 @@ public:
     shared_ptr<NArrayIndex> arrayIndex;
     shared_ptr<NExpression> expression;
 
-    NArrayAssignment() {className = __func__;}
+    NArrayAssignment() { className = __func__; }
 
     NArrayAssignment(shared_ptr<NArrayIndex> index, shared_ptr<NExpression> exp)
             : arrayIndex(index), expression(exp) {
