@@ -1,6 +1,6 @@
 
-#ifndef __ASTNODES_H__
-#define __ASTNODES_H__
+#ifndef __ASTNODES2_H__
+#define __ASTNODES2_H__
 
 #include <llvm/IR/Value.h>
 #include <json/json.h>
