@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 
     // std::cout << programBlock << std::endl;
     programBlock->print("--");
-    auto root = programBlock->jsonGen();
+    
 
 //    cout << root;
 
@@ -35,13 +35,20 @@ int main(int argc, char **argv) {
     context.generateCode(*programBlock);
     ObjGen(context);
 
-    string jsonFile = "visualization/tree.json";
+    auto root = programBlock->jsonGen();
+   
+    string jsonFile = "old_tree.json";
     std::ofstream astJson(jsonFile);
     if( astJson.is_open() ){
         astJson << root;
         astJson.close();
-        cout << "json write to " << jsonFile << endl;
+        cout << "old json write to " << jsonFile << endl;
     }
 
+     json j =programBlock->newjsonGen();
+     jsonFile = "new_tree.json";
+    std::ofstream outFile(jsonFile);
+    outFile << std::setw(4) << j << std::endl;
+cout << "new  json write to " << jsonFile << endl;
     return 0;
 }

@@ -16,6 +16,7 @@
 //puts("$1"); return $1;
 using namespace std;
 using json = nlohmann::json;
+
 /*
 using std::cout;
 using std::endl;
@@ -33,9 +34,9 @@ class NExpression;
 
 class NVariableDeclaration;
 
-typedef std::vector<shared_ptr<NStatement>> StatementList;
-typedef std::vector<shared_ptr<NExpression>> ExpressionList;
-typedef std::vector<shared_ptr<NVariableDeclaration>> VariableList;
+typedef std::vector <shared_ptr<NStatement>> StatementList;
+typedef std::vector <shared_ptr<NExpression>> ExpressionList;
+typedef std::vector <shared_ptr<NVariableDeclaration>> VariableList;
 
 class Node {
 protected:
@@ -53,7 +54,7 @@ public:
 
     virtual llvm::Value *codeGen(CodeGenContext &context) { return (llvm::Value *) 0; }
 
-  //  virtual json newjsonGen() const { return json(); }
+    virtual json newjsonGen() const { return json(); }
 
     virtual Json::Value jsonGen() const { return Json::Value(); }
 };
@@ -68,6 +69,12 @@ public:
 
     virtual void print(string prefix) const override {
         cout << prefix << getTypeName() << endl;
+    }
+
+    json newjsonGen() const override {
+        json j;
+        j["name"] = getTypeName();
+        return j;
     }
 
     Json::Value jsonGen() const override {
@@ -88,6 +95,12 @@ public:
 
     virtual void print(string prefix) const override {
         cout << prefix << getTypeName() << endl;
+    }
+
+    json newjsonGen() const override {
+        json j;
+        j["name"] = getTypeName();
+        return j;
     }
 
     Json::Value jsonGen() const override {
@@ -114,6 +127,12 @@ public:
 
     void print(string prefix) const override {
         cout << prefix << getTypeName() << this->m_DELIM << value << endl;
+    }
+
+    json newjsonGen() const override {
+        json j;
+        j["name"] = getTypeName() + this->m_DELIM + std::to_string(value);
+        return j;
     }
 
     Json::Value jsonGen() const override {
@@ -144,6 +163,12 @@ public:
         cout << prefix << getTypeName() << this->m_DELIM << value << endl;
     }
 
+    json newjsonGen() const override {
+        json j;
+        j["name"] = getTypeName() + this->m_DELIM + std::to_string(value);
+        return j;
+    }
+
     Json::Value jsonGen() const override {
         Json::Value root;
         root["name"] = getTypeName() + this->m_DELIM + std::to_string(value);
@@ -163,7 +188,7 @@ public:
     bool isType = false;
     bool isArray = false;
 
-    shared_ptr<ExpressionList> arraySize = make_shared<ExpressionList>();
+    shared_ptr <ExpressionList> arraySize = make_shared<ExpressionList>();
 
     NIdentifier() { className = __func__; }
 
@@ -175,6 +200,21 @@ public:
 
     string getTypeName() const override {
         return className;
+    }
+
+    json newjsonGen() const override {
+        json j;
+        j["name"] = getTypeName() + this->m_DELIM + name + (isArray ? "(Array)" : "");
+        bool flag = false;
+        for (auto it = arraySize->begin(); it != arraySize->end(); it++) {
+            if (flag == false) {
+                flag = true;
+                json children;
+                j["children"] = children;
+            }
+            children.push_back((*it)->newjsonGen());
+        }
+        return j;
     }
 
     Json::Value jsonGen() const override {
@@ -202,25 +242,37 @@ public:
 
 class NMethodCall : public NExpression {
 public:
-    const shared_ptr<NIdentifier> id;
-    shared_ptr<ExpressionList> arguments = make_shared<ExpressionList>();
+    const shared_ptr <NIdentifier> id;
+    shared_ptr <ExpressionList> arguments = make_shared<ExpressionList>();
 
     NMethodCall() {
         className = __func__;
     }
 
-    NMethodCall(const shared_ptr<NIdentifier> id, shared_ptr<ExpressionList> arguments)
+    NMethodCall(const shared_ptr <NIdentifier> id, shared_ptr <ExpressionList> arguments)
             : id(id), arguments(arguments) {
         className = __func__;
     }
 
-    NMethodCall(const shared_ptr<NIdentifier> id)
+    NMethodCall(const shared_ptr <NIdentifier> id)
             : id(id) {
         className = __func__;
     }
 
     string getTypeName() const override {
         return className;
+    }
+
+    json newjsonGen() const override {
+        json j;
+        j["name"] = getTypeName();
+        json children;
+        j["children"] = children;
+        children.push_back(this->id->newjsonGen());
+        for (auto it = arguments->begin(); it != arguments->end(); it++) {
+            children.push_back((*it)->newjsonGen());
+        }
+        return j;
     }
 
     Json::Value jsonGen() const override {
@@ -248,18 +300,29 @@ public:
 class NBinaryOperator : public NExpression {
 public:
     int op;
-    shared_ptr<NExpression> lhs;
-    shared_ptr<NExpression> rhs;
+    shared_ptr <NExpression> lhs;
+    shared_ptr <NExpression> rhs;
 
     NBinaryOperator() { className = __func__; }
 
-    NBinaryOperator(shared_ptr<NExpression> lhs, int op, shared_ptr<NExpression> rhs)
+    NBinaryOperator(shared_ptr <NExpression> lhs, int op, shared_ptr <NExpression> rhs)
             : lhs(lhs), rhs(rhs), op(op) {
         className = __func__;
     }
 
     string getTypeName() const override {
         return className;
+    }
+
+
+    json newjsonGen() const override {
+        json j;
+        j["name"] =getTypeName() + this->m_DELIM + std::to_string(op);
+        json children;
+        j["children"] = children;
+        children.push_back(lhs->newjsonGen());
+        children.push_back(rhs->newjsonGen());
+        return j;
     }
 
     Json::Value jsonGen() const override {
@@ -285,12 +348,12 @@ public:
 
 class NAssignment : public NExpression {
 public:
-    shared_ptr<NIdentifier> lhs;
-    shared_ptr<NExpression> rhs;
+    shared_ptr <NIdentifier> lhs;
+    shared_ptr <NExpression> rhs;
 
     NAssignment() { className = __func__; }
 
-    NAssignment(shared_ptr<NIdentifier> lhs, shared_ptr<NExpression> rhs)
+    NAssignment(shared_ptr <NIdentifier> lhs, shared_ptr <NExpression> rhs)
             : lhs(lhs), rhs(rhs) {
         className = __func__;
     }
@@ -306,6 +369,16 @@ public:
         rhs->print(nextPrefix);
     }
 
+    json newjsonGen() const override {
+        json j;
+        j["name"] =getTypeName() ;
+        json children;
+        j["children"] = children;
+        children.push_back(lhs->newjsonGen());
+        children.push_back(rhs->newjsonGen());
+        return j;
+    }
+
     Json::Value jsonGen() const override {
         Json::Value root;
         root["name"] = getTypeName();
@@ -319,7 +392,7 @@ public:
 
 class NBlock : public NExpression {
 public:
-    shared_ptr<StatementList> statements = make_shared<StatementList>();
+    shared_ptr <StatementList> statements = make_shared<StatementList>();
 
     NBlock() {
         className = __func__;
@@ -336,7 +409,21 @@ public:
             (*it)->print(nextPrefix);
         }
     }
-
+    json newjsonGen() const override {
+        json j;
+        j["name"] = getTypeName() ;
+        bool flag = false;
+         json children;
+        for (auto it = statements->begin(); it != statements->end(); it++) {
+            if (flag == false) {
+                flag = true;
+               
+                j["children"] = children;
+            }
+            children.push_back((*it)->newjsonGen());
+        }
+        return j;
+    }
     Json::Value jsonGen() const override {
         Json::Value root;
         root["name"] = getTypeName();
@@ -351,11 +438,11 @@ public:
 
 class NExpressionStatement : public NStatement {
 public:
-    shared_ptr<NExpression> expression;
+    shared_ptr <NExpression> expression;
 
     NExpressionStatement() { className = __func__; }
 
-    NExpressionStatement(shared_ptr<NExpression> expression)
+    NExpressionStatement(shared_ptr <NExpression> expression)
             : expression(expression) {
         className = __func__;
     }
@@ -370,6 +457,15 @@ public:
         expression->print(nextPrefix);
     }
 
+    json newjsonGen() const override {
+        json j;
+        j["name"] =getTypeName() ;
+        json children;
+        j["children"] = children;
+        children.push_back(expression->newjsonGen());
+        return j;
+    }
+
     Json::Value jsonGen() const override {
         Json::Value root;
         root["name"] = getTypeName();
@@ -382,14 +478,14 @@ public:
 
 class NVariableDeclaration : public NStatement {
 public:
-    const shared_ptr<NIdentifier> type;
-    shared_ptr<NIdentifier> id;
-    shared_ptr<NExpression> assignmentExpr = nullptr;
+    const shared_ptr <NIdentifier> type;
+    shared_ptr <NIdentifier> id;
+    shared_ptr <NExpression> assignmentExpr = nullptr;
 
     NVariableDeclaration() { className = __func__; }
 
-    NVariableDeclaration(const shared_ptr<NIdentifier> type, shared_ptr<NIdentifier> id,
-                         shared_ptr<NExpression> assignmentExpr = NULL)
+    NVariableDeclaration(const shared_ptr <NIdentifier> type, shared_ptr <NIdentifier> id,
+                         shared_ptr <NExpression> assignmentExpr = NULL)
             : type(type), id(id), assignmentExpr(assignmentExpr) {
         className = __func__;
         cout << "isArray = " << type->isArray << endl;
@@ -411,6 +507,19 @@ public:
         }
     }
 
+    json newjsonGen() const override {
+        json j;
+        j["name"] =getTypeName() ;
+        json children;
+        j["children"] = children;
+        children.push_back(type->newjsonGen());
+        children.push_back(id->newjsonGen());
+        if (assignmentExpr != nullptr) {
+            j["children"].push_back(assignmentExpr->newjsonGen());
+        }
+        return j;
+    }
+
     Json::Value jsonGen() const override {
         Json::Value root;
         root["name"] = getTypeName();
@@ -427,16 +536,17 @@ public:
 
 class NFunctionDeclaration : public NStatement {
 public:
-    shared_ptr<NIdentifier> type;
-    shared_ptr<NIdentifier> id;
-    shared_ptr<VariableList> arguments = make_shared<VariableList>();
-    shared_ptr<NBlock> block;
+    shared_ptr <NIdentifier> type;
+    shared_ptr <NIdentifier> id;
+    shared_ptr <VariableList> arguments = make_shared<VariableList>();
+    shared_ptr <NBlock> block;
     bool isExternal = false;
 
     NFunctionDeclaration() { className = __func__; }
 
-    NFunctionDeclaration(shared_ptr<NIdentifier> type, shared_ptr<NIdentifier> id, shared_ptr<VariableList> arguments,
-                         shared_ptr<NBlock> block, bool isExt = false)
+    NFunctionDeclaration(shared_ptr <NIdentifier> type, shared_ptr <NIdentifier> id,
+                         shared_ptr <VariableList> arguments,
+                         shared_ptr <NBlock> block, bool isExt = false)
             : type(type), id(id), arguments(arguments), block(block), isExternal(isExt) {
         className = __func__;
         assert(type->isType);
@@ -462,6 +572,26 @@ public:
             block->print(nextPrefix);
     }
 
+    json newjsonGen() const override {
+        json j;
+        j["name"] =getTypeName() ;
+        json children;
+        j["children"] = children;
+        children.push_back(type->newjsonGen());
+        children.push_back(id->newjsonGen());
+
+        for (auto it = arguments->begin(); it != arguments->end(); it++) {
+            j["children"].push_back((*it)->newjsonGen());
+        }
+
+        assert(isExternal || block != nullptr);
+        if (block) {
+            j["children"].push_back(block->newjsonGen());
+        }
+
+        return j;
+    }
+
     Json::Value jsonGen() const override {
         Json::Value root;
         root["name"] = getTypeName();
@@ -485,12 +615,12 @@ public:
 
 class NStructDeclaration : public NStatement {
 public:
-    shared_ptr<NIdentifier> name;
-    shared_ptr<VariableList> members = make_shared<VariableList>();
+    shared_ptr <NIdentifier> name;
+    shared_ptr <VariableList> members = make_shared<VariableList>();
 
     NStructDeclaration() { className = __func__; }
 
-    NStructDeclaration(shared_ptr<NIdentifier> id, shared_ptr<VariableList> arguments)
+    NStructDeclaration(shared_ptr <NIdentifier> id, shared_ptr <VariableList> arguments)
             : name(id), members(arguments) {
         className = __func__;
     }
@@ -506,6 +636,22 @@ public:
         for (auto it = members->begin(); it != members->end(); it++) {
             (*it)->print(nextPrefix);
         }
+    }
+
+    json newjsonGen() const override {
+        json j;
+        j["name"] = getTypeName() + this->m_DELIM + this->name->name;
+        bool flag = false;
+        json children;
+        for (auto it = members->begin(); it != members->end(); it++) {
+            if (flag == false) {
+                flag = true;
+              
+                j["children"] = children;
+            }
+            children.push_back((*it)->newjsonGen());
+        }
+        return j;
     }
 
 
@@ -525,11 +671,11 @@ public:
 
 class NReturnStatement : public NStatement {
 public:
-    shared_ptr<NExpression> expression;
+    shared_ptr <NExpression> expression;
 
     NReturnStatement() { className = __func__; }
 
-    NReturnStatement(shared_ptr<NExpression> expression)
+    NReturnStatement(shared_ptr <NExpression> expression)
             : expression(expression) {
         className = __func__;
     }
@@ -543,6 +689,15 @@ public:
         root["name"] = getTypeName();
         root["children"].append(expression->jsonGen());
         return root;
+    }
+
+    json newjsonGen() const override {
+        json j;
+        j["name"] =getTypeName() ;
+        json children;
+        j["children"] = children;
+        children.push_back(expression->newjsonGen());
+        return j;
     }
 
     void print(string prefix) const override {
@@ -559,14 +714,14 @@ public:
 class NIfStatement : public NStatement {
 public:
 
-    shared_ptr<NExpression> condition;
-    shared_ptr<NBlock> trueBlock;          // should not be null
-    shared_ptr<NBlock> falseBlock;         // can be null
+    shared_ptr <NExpression> condition;
+    shared_ptr <NBlock> trueBlock;          // should not be null
+    shared_ptr <NBlock> falseBlock;         // can be null
 
 
     NIfStatement() { className = __func__; }
 
-    NIfStatement(shared_ptr<NExpression> cond, shared_ptr<NBlock> blk, shared_ptr<NBlock> blk2 = nullptr)
+    NIfStatement(shared_ptr <NExpression> cond, shared_ptr <NBlock> blk, shared_ptr <NBlock> blk2 = nullptr)
             : condition(cond), trueBlock(blk), falseBlock(blk2) {
         className = __func__;
     }
@@ -600,6 +755,19 @@ public:
         return root;
     }
 
+    json newjsonGen() const override {
+        json j;
+        j["name"] =getTypeName() ;
+        json children;
+        j["children"] = children;
+        children.push_back(condition->newjsonGen());
+        children.push_back(trueBlock->newjsonGen());
+        if (falseBlock) {
+            children.push_back(falseBlock->newjsonGen());
+        }
+        return j;
+    }
+
 
     llvm::Value *codeGen(CodeGenContext &context) override;
 
@@ -608,13 +776,14 @@ public:
 
 class NForStatement : public NStatement {
 public:
-    shared_ptr<NExpression> initial, condition, increment;
-    shared_ptr<NBlock> block;
+    shared_ptr <NExpression> initial, condition, increment;
+    shared_ptr <NBlock> block;
 
     NForStatement() { className = __func__; }
 
-    NForStatement(shared_ptr<NBlock> b, shared_ptr<NExpression> init = nullptr, shared_ptr<NExpression> cond = nullptr,
-                  shared_ptr<NExpression> incre = nullptr)
+    NForStatement(shared_ptr <NBlock> b, shared_ptr <NExpression> init = nullptr,
+                  shared_ptr <NExpression> cond = nullptr,
+                  shared_ptr <NExpression> incre = nullptr)
             : block(b), initial(init), condition(cond), increment(incre) {
         className = __func__;
         if (condition == nullptr) {
@@ -642,6 +811,21 @@ public:
     }
 
 
+    json newjsonGen() const override {
+        json j;
+        j["name"] =getTypeName() ;
+        json children;
+        j["children"] = children;
+        if (initial)
+           children.push_back(initial->newjsonGen());
+        if (condition)
+             children.push_back(condition->newjsonGen());
+        if (increment)
+             children.push_back(increment->newjsonGen());
+        return j;
+    }
+
+
     Json::Value jsonGen() const override {
         Json::Value root;
         root["name"] = getTypeName();
@@ -662,12 +846,12 @@ public:
 
 class NStructMember : public NExpression {
 public:
-    shared_ptr<NIdentifier> id;
-    shared_ptr<NIdentifier> member;
+    shared_ptr <NIdentifier> id;
+    shared_ptr <NIdentifier> member;
 
     NStructMember() { className = __func__; }
 
-    NStructMember(shared_ptr<NIdentifier> structName, shared_ptr<NIdentifier> member)
+    NStructMember(shared_ptr <NIdentifier> structName, shared_ptr <NIdentifier> member)
             : id(structName), member(member) {
         className = __func__;
     }
@@ -683,6 +867,16 @@ public:
 
         id->print(nextPrefix);
         member->print(nextPrefix);
+    }
+
+    json newjsonGen() const override {
+        json j;
+        j["name"] =getTypeName() ;
+        json children;
+        j["children"] = children;
+        children.push_back(id->newjsonGen());
+        children.push_back(member->newjsonGen());
+        return j;
     }
 
 
@@ -702,20 +896,20 @@ public:
 
 class NArrayIndex : public NExpression {
 public:
-    shared_ptr<NIdentifier> arrayName;
+    shared_ptr <NIdentifier> arrayName;
 //    shared_ptr<NExpression>  expression;
-    shared_ptr<ExpressionList> expressions = make_shared<ExpressionList>();
+    shared_ptr <ExpressionList> expressions = make_shared<ExpressionList>();
 
     NArrayIndex() { className = __func__; }
 
-    NArrayIndex(shared_ptr<NIdentifier> name2, shared_ptr<NExpression> exp)
+    NArrayIndex(shared_ptr <NIdentifier> name2, shared_ptr <NExpression> exp)
             : arrayName(name2) {
         className = __func__;
         expressions->push_back(exp);
     }
 
 
-    NArrayIndex(shared_ptr<NIdentifier> name2, shared_ptr<ExpressionList> list)
+    NArrayIndex(shared_ptr <NIdentifier> name2, shared_ptr <ExpressionList> list)
             : arrayName(name2), expressions(list) {
         className = __func__;
     }
@@ -747,18 +941,30 @@ public:
         return root;
     }
 
+    json newjsonGen() const override {
+        json j;
+        j["name"] =getTypeName() ;
+        json children;
+        j["children"] = children;
+        children.push_back(arrayName->newjsonGen());
+        for (auto it = expressions->begin(); it != expressions->end(); it++) {
+            children.push_back((*it)->newjsonGen());
+        }
+        return j;
+    }
+
     llvm::Value *codeGen(CodeGenContext &context) override;
 
 };
 
 class NArrayAssignment : public NExpression {
 public:
-    shared_ptr<NArrayIndex> arrayIndex;
-    shared_ptr<NExpression> expression;
+    shared_ptr <NArrayIndex> arrayIndex;
+    shared_ptr <NExpression> expression;
 
     NArrayAssignment() { className = __func__; }
 
-    NArrayAssignment(shared_ptr<NArrayIndex> index, shared_ptr<NExpression> exp)
+    NArrayAssignment(shared_ptr <NArrayIndex> index, shared_ptr <NExpression> exp)
             : arrayIndex(index), expression(exp) {
         className = __func__;
     }
@@ -787,6 +993,16 @@ public:
         return root;
     }
 
+    json newjsonGen() const override {
+        json j;
+        j["name"] =getTypeName() ;
+        json children;
+        j["children"] = children;
+        children.push_back(arrayIndex->newjsonGen());
+        children.push_back(expression->newjsonGen());
+        return j;
+    }
+
 
     llvm::Value *codeGen(CodeGenContext &context) override;
 
@@ -797,10 +1013,10 @@ public:
 
     NArrayInitialization() { className = __func__; }
 
-    shared_ptr<NVariableDeclaration> declaration;
-    shared_ptr<ExpressionList> expressionList = make_shared<ExpressionList>();
+    shared_ptr <NVariableDeclaration> declaration;
+    shared_ptr <ExpressionList> expressionList = make_shared<ExpressionList>();
 
-    NArrayInitialization(shared_ptr<NVariableDeclaration> dec, shared_ptr<ExpressionList> list)
+    NArrayInitialization(shared_ptr <NVariableDeclaration> dec, shared_ptr <ExpressionList> list)
             : declaration(dec), expressionList(list) {
         className = __func__;
     }
@@ -832,6 +1048,19 @@ public:
         return root;
     }
 
+    json newjsonGen() const override {
+        json j;
+        j["name"] =getTypeName() ;
+        json children;
+        j["children"] = children;
+        children.push_back(declaration->newjsonGen());
+
+        for (auto it = expressionList->begin(); it != expressionList->end(); it++)
+             children.push_back((*it)->newjsonGen());
+     //   children.push_back(rhs->newjsonGen());
+        return j;
+    }
+
 
     llvm::Value *codeGen(CodeGenContext &context) override;
 
@@ -839,12 +1068,12 @@ public:
 
 class NStructAssignment : public NExpression {
 public:
-    shared_ptr<NStructMember> structMember;
-    shared_ptr<NExpression> expression;
+    shared_ptr <NStructMember> structMember;
+    shared_ptr <NExpression> expression;
 
     NStructAssignment() { className = __func__; }
 
-    NStructAssignment(shared_ptr<NStructMember> member, shared_ptr<NExpression> exp)
+    NStructAssignment(shared_ptr <NStructMember> member, shared_ptr <NExpression> exp)
             : structMember(member), expression(exp) {
         className = __func__;
     }
@@ -871,6 +1100,16 @@ public:
         root["children"].append(expression->jsonGen());
 
         return root;
+    }
+
+    json newjsonGen() const override {
+        json j;
+        j["name"] =getTypeName() ;
+        json children;
+        j["children"] = children;
+        children.push_back(structMember->newjsonGen());
+        children.push_back(expression->newjsonGen());
+        return j;
     }
 
     llvm::Value *codeGen(CodeGenContext &context) override;
@@ -906,11 +1145,18 @@ public:
         return root;
     }
 
+    json newjsonGen() const override {
+        json j;
+        j["name"] =getTypeName() + this->m_DELIM + value;
+
+        return j;
+    }
+
     llvm::Value *codeGen(CodeGenContext &context) override;
 
 };
 
 
-std::unique_ptr<NExpression> LogError(const char *str);
+std::unique_ptr <NExpression> LogError(const char *str);
 
 #endif
