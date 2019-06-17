@@ -12,12 +12,14 @@
 #include <typeinfo>
 #include <regex>
 //puts("$1"); return $1;
+using namespace std;
+/*
 using std::cout;
 using std::endl;
 using std::string;
 using std::shared_ptr;
 using std::make_shared;
-
+*/
 class CodeGenContext;
 
 class NBlock;
@@ -36,13 +38,13 @@ class Node {
 protected:
     const char m_DELIM = ':';
     const char *m_PREFIX = "--";
-    string name;
+    string className;
 public:
-    Node() { name = __func__; }
+    Node() { className = __func__; }
 
     virtual ~Node() {}
 
-    virtual string getTypeName() const { return name; };
+    virtual string getTypeName() const { return className; };
 
     virtual void print(string prefix) const {}
 
@@ -53,10 +55,10 @@ public:
 
 class NExpression : public Node {
 public:
-    NExpression() { name = __func__; }
+    NExpression() { className = __func__; }
 
     string getTypeName() const override {
-        return name;
+        return className;
     }
 
     virtual void print(string prefix) const override {
@@ -73,10 +75,10 @@ public:
 
 class NStatement : public Node {
 public:
-    NStatement() { name = __func__; }
+    NStatement() { className = __func__; }
 
     string getTypeName() const override {
-        return "NStatement";
+        return className;
     }
 
     virtual void print(string prefix) const override {
@@ -94,7 +96,7 @@ class NDouble : public NExpression {
 public:
     double value;
 
-    NDouble() { name = __func__; }
+    NDouble() { className = __func__; }
 
     NDouble(double value)
             : value(value) {
@@ -102,7 +104,7 @@ public:
     }
 
     string getTypeName() const override {
-        return "NDouble";
+        return className;
     }
 
     void print(string prefix) const override {
@@ -122,7 +124,7 @@ class NInteger : public NExpression {
 public:
     uint64_t value;
 
-    NInteger() { name = __func__; }
+    NInteger() { className = __func__; }
 
     NInteger(uint64_t value)
             : value(value) {
@@ -130,7 +132,7 @@ public:
     }
 
     string getTypeName() const override {
-        return "NInteger";
+        return className;
     }
 
     void print(string prefix) const override {
@@ -158,15 +160,16 @@ public:
 
     shared_ptr<ExpressionList> arraySize = make_shared<ExpressionList>();
 
-    NIdentifier() { name = __func__; }
+    NIdentifier() { className = __func__; }
 
     NIdentifier(const std::string &name)
             : name(name) {
+                className = __func__;
         // return "NIdentifier=" << name << endl;
     }
 
     string getTypeName() const override {
-        return "NIdentifier";
+        return className;
     }
 
     Json::Value jsonGen() const override {
@@ -198,19 +201,21 @@ public:
     shared_ptr<ExpressionList> arguments = make_shared<ExpressionList>();
 
     NMethodCall() {
-        name = __func__;
+        className = __func__;
     }
 
     NMethodCall(const shared_ptr<NIdentifier> id, shared_ptr<ExpressionList> arguments)
             : id(id), arguments(arguments) {
+        className = __func__;
     }
 
     NMethodCall(const shared_ptr<NIdentifier> id)
             : id(id) {
+        className = __func__;
     }
 
     string getTypeName() const override {
-        return "NMethodCall";
+        return className;
     }
 
     Json::Value jsonGen() const override {
@@ -241,14 +246,15 @@ public:
     shared_ptr<NExpression> lhs;
     shared_ptr<NExpression> rhs;
 
-    NBinaryOperator() {name = __func__;}
+    NBinaryOperator() { className = __func__; }
 
     NBinaryOperator(shared_ptr<NExpression> lhs, int op, shared_ptr<NExpression> rhs)
             : lhs(lhs), rhs(rhs), op(op) {
+        className = __func__;
     }
 
     string getTypeName() const override {
-        return "NBinaryOperator";
+        return className;
     }
 
     Json::Value jsonGen() const override {
@@ -277,14 +283,15 @@ public:
     shared_ptr<NIdentifier> lhs;
     shared_ptr<NExpression> rhs;
 
-    NAssignment() {name = __func__;}
+    NAssignment() { className = __func__; }
 
     NAssignment(shared_ptr<NIdentifier> lhs, shared_ptr<NExpression> rhs)
             : lhs(lhs), rhs(rhs) {
+        className = __func__;
     }
 
     string getTypeName() const override {
-        return "NAssignment";
+        return className;
     }
 
     void print(string prefix) const override {
@@ -310,11 +317,11 @@ public:
     shared_ptr<StatementList> statements = make_shared<StatementList>();
 
     NBlock() {
-        name = __func__;
+        className = __func__;
     }
 
     string getTypeName() const override {
-        return "NBlock";
+        return className;
     }
 
     void print(string prefix) const override {
@@ -341,15 +348,15 @@ class NExpressionStatement : public NStatement {
 public:
     shared_ptr<NExpression> expression;
 
-    NExpressionStatement() {name = __func__;}
+    NExpressionStatement() { className = __func__; }
 
     NExpressionStatement(shared_ptr<NExpression> expression)
             : expression(expression) {
-        name = __func__;
+        className = __func__;
     }
 
     string getTypeName() const override {
-        return "NExpressionStatement";
+        return className;
     }
 
     void print(string prefix) const override {
@@ -374,19 +381,19 @@ public:
     shared_ptr<NIdentifier> id;
     shared_ptr<NExpression> assignmentExpr = nullptr;
 
-    NVariableDeclaration() {name = __func__;}
+    NVariableDeclaration() { className = __func__; }
 
     NVariableDeclaration(const shared_ptr<NIdentifier> type, shared_ptr<NIdentifier> id,
                          shared_ptr<NExpression> assignmentExpr = NULL)
             : type(type), id(id), assignmentExpr(assignmentExpr) {
-        name = __func__;
+        className = __func__;
         cout << "isArray = " << type->isArray << endl;
         assert(type->isType);
         assert(!type->isArray || (type->isArray && type->arraySize != nullptr));
     }
 
     string getTypeName() const override {
-        return "NVariableDeclaration";
+        return className;
     }
 
     void print(string prefix) const override {
@@ -421,17 +428,17 @@ public:
     shared_ptr<NBlock> block;
     bool isExternal = false;
 
-    NFunctionDeclaration() {name = __func__;}
+    NFunctionDeclaration() { className = __func__; }
 
     NFunctionDeclaration(shared_ptr<NIdentifier> type, shared_ptr<NIdentifier> id, shared_ptr<VariableList> arguments,
                          shared_ptr<NBlock> block, bool isExt = false)
             : type(type), id(id), arguments(arguments), block(block), isExternal(isExt) {
-        name = __func__;
+        className = __func__;
         assert(type->isType);
     }
 
     string getTypeName() const override {
-        return "NFunctionDeclaration";
+        return className;
     }
 
     void print(string prefix) const override {
@@ -476,15 +483,15 @@ public:
     shared_ptr<NIdentifier> name;
     shared_ptr<VariableList> members = make_shared<VariableList>();
 
-    NStructDeclaration() {}
+    NStructDeclaration() {className = __func__;}
 
     NStructDeclaration(shared_ptr<NIdentifier> id, shared_ptr<VariableList> arguments)
             : name(id), members(arguments) {
-
+        className = __func__;
     }
 
     string getTypeName() const override {
-        return "NStructDeclaration";
+        return className;
     }
 
     void print(string prefix) const override {
@@ -515,15 +522,15 @@ class NReturnStatement : public NStatement {
 public:
     shared_ptr<NExpression> expression;
 
-    NReturnStatement() {name = __func__;}
+    NReturnStatement() { className = __func__; }
 
     NReturnStatement(shared_ptr<NExpression> expression)
             : expression(expression) {
-        name = __func__;
+        className = __func__;
     }
 
     string getTypeName() const override {
-        return "NReturnStatement";
+        return className;
     }
 
     Json::Value jsonGen() const override {
@@ -552,15 +559,15 @@ public:
     shared_ptr<NBlock> falseBlock;         // can be null
 
 
-    NIfStatement() {name = __func__;}
+    NIfStatement() { className = __func__; }
 
     NIfStatement(shared_ptr<NExpression> cond, shared_ptr<NBlock> blk, shared_ptr<NBlock> blk2 = nullptr)
             : condition(cond), trueBlock(blk), falseBlock(blk2) {
-        name = __func__;
+        className = __func__;
     }
 
     string getTypeName() const override {
-        return "NIfStatement";
+        return className;
     }
 
     void print(string prefix) const override {
@@ -599,19 +606,19 @@ public:
     shared_ptr<NExpression> initial, condition, increment;
     shared_ptr<NBlock> block;
 
-    NForStatement() {name = __func__;}
+    NForStatement() { className = __func__; }
 
     NForStatement(shared_ptr<NBlock> b, shared_ptr<NExpression> init = nullptr, shared_ptr<NExpression> cond = nullptr,
                   shared_ptr<NExpression> incre = nullptr)
             : block(b), initial(init), condition(cond), increment(incre) {
-        name = __func__;
+        className = __func__;
         if (condition == nullptr) {
             condition = make_shared<NInteger>(1);
         }
     }
 
     string getTypeName() const override {
-        return "NForStatement";
+        return className;
     }
 
     void print(string prefix) const override {
@@ -653,15 +660,15 @@ public:
     shared_ptr<NIdentifier> id;
     shared_ptr<NIdentifier> member;
 
-    NStructMember() {name = __func__;}
+    NStructMember() { className = __func__; }
 
     NStructMember(shared_ptr<NIdentifier> structName, shared_ptr<NIdentifier> member)
             : id(structName), member(member) {
-        name = __func__;
+        className = __func__;
     }
 
     string getTypeName() const override {
-        return "NStructMember";
+        return className;
     }
 
     void print(string prefix) const override {
@@ -694,22 +701,22 @@ public:
 //    shared_ptr<NExpression>  expression;
     shared_ptr<ExpressionList> expressions = make_shared<ExpressionList>();
 
-    NArrayIndex() {name = __func__;}
+    NArrayIndex() { className = __func__; }
 
     NArrayIndex(shared_ptr<NIdentifier> name2, shared_ptr<NExpression> exp)
             : arrayName(name2) {
-        name = __func__;
+        className = __func__;
         expressions->push_back(exp);
     }
 
 
     NArrayIndex(shared_ptr<NIdentifier> name2, shared_ptr<ExpressionList> list)
             : arrayName(name2), expressions(list) {
-        name = __func__;
+        className = __func__;
     }
 
     string getTypeName() const override {
-        return "NArrayIndex";
+        return className;
     }
 
     void print(string prefix) const override {
@@ -744,15 +751,15 @@ public:
     shared_ptr<NArrayIndex> arrayIndex;
     shared_ptr<NExpression> expression;
 
-    NArrayAssignment() {}
+    NArrayAssignment() {className = __func__;}
 
     NArrayAssignment(shared_ptr<NArrayIndex> index, shared_ptr<NExpression> exp)
             : arrayIndex(index), expression(exp) {
-        name = __func__;
+        className = __func__;
     }
 
     string getTypeName() const override {
-        return "NArrayAssignment";
+        return className;
     }
 
     void print(string prefix) const override {
@@ -783,18 +790,18 @@ public:
 class NArrayInitialization : public NStatement {
 public:
 
-    NArrayInitialization() {name = __func__;}
+    NArrayInitialization() { className = __func__; }
 
     shared_ptr<NVariableDeclaration> declaration;
     shared_ptr<ExpressionList> expressionList = make_shared<ExpressionList>();
 
     NArrayInitialization(shared_ptr<NVariableDeclaration> dec, shared_ptr<ExpressionList> list)
             : declaration(dec), expressionList(list) {
-        name = __func__;
+        className = __func__;
     }
 
     string getTypeName() const override {
-        return "NArrayInitialization";
+        return className;
     }
 
     void print(string prefix) const override {
@@ -830,15 +837,15 @@ public:
     shared_ptr<NStructMember> structMember;
     shared_ptr<NExpression> expression;
 
-    NStructAssignment() {name = __func__;}
+    NStructAssignment() { className = __func__; }
 
     NStructAssignment(shared_ptr<NStructMember> member, shared_ptr<NExpression> exp)
             : structMember(member), expression(exp) {
-        name = __func__;
+        className = __func__;
     }
 
     string getTypeName() const override {
-        return "NStructAssignment";
+        return className;
     }
 
     void print(string prefix) const override {
@@ -869,15 +876,15 @@ class NLiteral : public NExpression {
 public:
     string value;
 
-    NLiteral() {name = __func__;}
+    NLiteral() { className = __func__; }
 
     NLiteral(const string &str) {
         value = str.substr(1, str.length() - 2);
-        name = __func__;
+        className = __func__;
     }
 
     string getTypeName() const override {
-        return "NLiteral";
+        return className;
     }
 
     void print(string prefix) const override {
