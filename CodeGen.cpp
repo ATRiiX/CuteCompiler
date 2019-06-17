@@ -324,7 +324,7 @@ llvm::Value* NVariableDeclaration::codeGen(CodeGenContext &context) {
     context.setSymbolType(this->id->name, this->type);
     context.setSymbolValue(this->id->name, inst);
 
-    context.PrintSymTable();
+  //  context.PrintSymTable();
 
     if( this->assignmentExpr != nullptr ){
         NAssignment assignment(this->id, this->assignmentExpr);

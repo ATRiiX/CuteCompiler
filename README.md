@@ -52,8 +52,9 @@ clang++  output.o -o test
 ./test          
 
 cat tests/error.myc | ./compiler          
-clang++  output.o -o test          
-./test        
+
+
+
 
  
 cat tests/Array.myc | ./compiler          
