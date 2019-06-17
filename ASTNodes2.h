@@ -206,10 +206,11 @@ public:
         json j;
         j["name"] = getTypeName() + this->m_DELIM + name + (isArray ? "(Array)" : "");
         bool flag = false;
+        json children;
         for (auto it = arraySize->begin(); it != arraySize->end(); it++) {
             if (flag == false) {
                 flag = true;
-                json children;
+                
                 j["children"] = children;
             }
             children.push_back((*it)->newjsonGen());
