@@ -696,15 +696,15 @@ public:
 
     NArrayIndex() {name = __func__;}
 
-    NArrayIndex(shared_ptr<NIdentifier> name, shared_ptr<NExpression> exp)
-            : arrayName(name) {
+    NArrayIndex(shared_ptr<NIdentifier> name2, shared_ptr<NExpression> exp)
+            : arrayName(name2) {
         name = __func__;
         expressions->push_back(exp);
     }
 
 
-    NArrayIndex(shared_ptr<NIdentifier> name, shared_ptr<ExpressionList> list)
-            : arrayName(name), expressions(list) {
+    NArrayIndex(shared_ptr<NIdentifier> name2, shared_ptr<ExpressionList> list)
+            : arrayName(name2), expressions(list) {
         name = __func__;
     }
 
