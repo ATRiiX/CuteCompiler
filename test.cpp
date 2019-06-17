@@ -1,8 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include "ASTNodes2.h"
-#include "CodeGen.h"
-#include "ObjGen.h"
 #include "json.hpp"
 
 using namespace std;
@@ -10,7 +8,7 @@ using json = nlohmann::json;
 
 int main(int argc, char **argv) {
     cout << "test start " << endl;
-    string jsonFile = "visualization/new_tree.json";
+
 
     // create an empty structure (null)
     json j;
@@ -53,6 +51,8 @@ int main(int argc, char **argv) {
                         }}
     };
 
+
+    string jsonFile = "new_tree.json";
     std::ofstream outFile(jsonFile);
     outFile << std::setw(4) << j << std::endl;
 
