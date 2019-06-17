@@ -41,25 +41,15 @@ int main(int argc, char **argv) {
                    {"value",    42.99}};
 
     // instead, you could also write (which looks very similar to the JSON above)
-    json j2 = {
-            {"pi",      3.141},
-            {"happy",   true},
-            {"name",    "Niels"},
-            {"nothing", nullptr},
-            {"answer",  {
-                                {"everything", 42}
-                        }},
-            {"list",    {       1, 0, 2}},
-            {"object",  {
-                                {"currency",   "USD"},
-                                   {"value", 42.99}
-                        }}
-    };
+     json children;
+     
+     children["list"] = {1, 0, 2};
+ //   children.push_back(string("push_back test"));
+j["children"] = children;
 
-
-    string jsonFile = "new_tree.json";
-    std::ofstream outFile(jsonFile);
-    outFile << std::setw(4) << j << std::endl;
+  //  string jsonFile = "new_tree.json";
+  //  std::ofstream outFile(jsonFile);
+ //   outFile << std::setw(4) << j << std::endl;
 
     std::cout << j.dump(4) << std::endl;
 }

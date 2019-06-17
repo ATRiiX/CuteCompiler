@@ -211,9 +211,12 @@ public:
             if (flag == false) {
                 flag = true;
                 
-                j["children"] = children;
+              
             }
             children.push_back((*it)->newjsonGen());
+        }
+        if(flag==true){
+             j["children"] = children;
         }
         return j;
     }
@@ -268,11 +271,12 @@ public:
         json j;
         j["name"] = getTypeName();
         json children;
-        j["children"] = children;
+       
         children.push_back(this->id->newjsonGen());
         for (auto it = arguments->begin(); it != arguments->end(); it++) {
             children.push_back((*it)->newjsonGen());
         }
+         j["children"] = children;
         return j;
     }
 
@@ -320,9 +324,10 @@ public:
         json j;
         j["name"] =getTypeName() + this->m_DELIM + std::to_string(op);
         json children;
-        j["children"] = children;
+        
         children.push_back(lhs->newjsonGen());
         children.push_back(rhs->newjsonGen());
+        j["children"] = children;
         return j;
     }
 
@@ -374,9 +379,10 @@ public:
         json j;
         j["name"] =getTypeName() ;
         json children;
-        j["children"] = children;
+        
         children.push_back(lhs->newjsonGen());
         children.push_back(rhs->newjsonGen());
+        j["children"] = children;
         return j;
     }
 
@@ -418,10 +424,12 @@ public:
         for (auto it = statements->begin(); it != statements->end(); it++) {
             if (flag == false) {
                 flag = true;
-               
-                j["children"] = children;
+
             }
             children.push_back((*it)->newjsonGen());
+        }
+        if(flag==true){
+             j["children"] = children;
         }
         return j;
     }
@@ -462,8 +470,9 @@ public:
         json j;
         j["name"] =getTypeName() ;
         json children;
-        j["children"] = children;
+        
         children.push_back(expression->newjsonGen());
+        j["children"] = children;
         return j;
     }
 
@@ -512,12 +521,13 @@ public:
         json j;
         j["name"] =getTypeName() ;
         json children;
-        j["children"] = children;
+        
         children.push_back(type->newjsonGen());
         children.push_back(id->newjsonGen());
         if (assignmentExpr != nullptr) {
             j["children"].push_back(assignmentExpr->newjsonGen());
         }
+        j["children"] = children;
         return j;
     }
 
@@ -577,7 +587,7 @@ public:
         json j;
         j["name"] =getTypeName() ;
         json children;
-        j["children"] = children;
+        
         children.push_back(type->newjsonGen());
         children.push_back(id->newjsonGen());
 
@@ -589,7 +599,7 @@ public:
         if (block) {
             j["children"].push_back(block->newjsonGen());
         }
-
+j["children"] = children;
         return j;
     }
 
@@ -647,10 +657,12 @@ public:
         for (auto it = members->begin(); it != members->end(); it++) {
             if (flag == false) {
                 flag = true;
-              
-                j["children"] = children;
+
             }
             children.push_back((*it)->newjsonGen());
+        }
+        if(flag==true){
+             j["children"] = children;
         }
         return j;
     }
@@ -696,8 +708,9 @@ public:
         json j;
         j["name"] =getTypeName() ;
         json children;
-        j["children"] = children;
+        
         children.push_back(expression->newjsonGen());
+        j["children"] = children;
         return j;
     }
 
@@ -760,12 +773,13 @@ public:
         json j;
         j["name"] =getTypeName() ;
         json children;
-        j["children"] = children;
+       
         children.push_back(condition->newjsonGen());
         children.push_back(trueBlock->newjsonGen());
         if (falseBlock) {
             children.push_back(falseBlock->newjsonGen());
         }
+         j["children"] = children;
         return j;
     }
 
@@ -816,13 +830,20 @@ public:
         json j;
         j["name"] =getTypeName() ;
         json children;
-        j["children"] = children;
-        if (initial)
-           children.push_back(initial->newjsonGen());
-        if (condition)
+       
+        if (initial){
+children.push_back(initial->newjsonGen());
+        }
+           
+        if (condition){
              children.push_back(condition->newjsonGen());
-        if (increment)
+        }
+            
+        if (increment){
              children.push_back(increment->newjsonGen());
+        }
+            
+         j["children"] = children;
         return j;
     }
 
@@ -874,9 +895,10 @@ public:
         json j;
         j["name"] =getTypeName() ;
         json children;
-        j["children"] = children;
+        
         children.push_back(id->newjsonGen());
         children.push_back(member->newjsonGen());
+        j["children"] = children;
         return j;
     }
 
@@ -946,11 +968,12 @@ public:
         json j;
         j["name"] =getTypeName() ;
         json children;
-        j["children"] = children;
+        
         children.push_back(arrayName->newjsonGen());
         for (auto it = expressions->begin(); it != expressions->end(); it++) {
             children.push_back((*it)->newjsonGen());
         }
+        j["children"] = children;
         return j;
     }
 
@@ -998,9 +1021,10 @@ public:
         json j;
         j["name"] =getTypeName() ;
         json children;
-        j["children"] = children;
+       
         children.push_back(arrayIndex->newjsonGen());
         children.push_back(expression->newjsonGen());
+         j["children"] = children;
         return j;
     }
 
@@ -1053,12 +1077,13 @@ public:
         json j;
         j["name"] =getTypeName() ;
         json children;
-        j["children"] = children;
+       
         children.push_back(declaration->newjsonGen());
 
         for (auto it = expressionList->begin(); it != expressionList->end(); it++)
              children.push_back((*it)->newjsonGen());
      //   children.push_back(rhs->newjsonGen());
+      j["children"] = children;
         return j;
     }
 
@@ -1107,9 +1132,10 @@ public:
         json j;
         j["name"] =getTypeName() ;
         json children;
-        j["children"] = children;
+        
         children.push_back(structMember->newjsonGen());
         children.push_back(expression->newjsonGen());
+        j["children"] = children;
         return j;
     }
 
