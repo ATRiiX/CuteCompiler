@@ -525,7 +525,7 @@ public:
         children.push_back(type->newjsonGen());
         children.push_back(id->newjsonGen());
         if (assignmentExpr != nullptr) {
-            j["children"].push_back(assignmentExpr->newjsonGen());
+           children.push_back(assignmentExpr->newjsonGen());
         }
         j["children"] = children;
         return j;
@@ -592,12 +592,12 @@ public:
         children.push_back(id->newjsonGen());
 
         for (auto it = arguments->begin(); it != arguments->end(); it++) {
-            j["children"].push_back((*it)->newjsonGen());
+           children.push_back((*it)->newjsonGen());
         }
 
         assert(isExternal || block != nullptr);
         if (block) {
-            j["children"].push_back(block->newjsonGen());
+           children.push_back(block->newjsonGen());
         }
 j["children"] = children;
         return j;

@@ -1,4 +1,38 @@
 {
-    "children": null,
+    "children": [
+        {
+            "children": [
+                {
+                    "name": "NIdentifier:int"
+                },
+                {
+                    "name": "NIdentifier:printf"
+                }
+            ],
+            "name": "NFunctionDeclaration"
+        },
+        {
+            "children": [
+                {
+                    "name": "NIdentifier:int"
+                },
+                {
+                    "name": "NIdentifier:puts"
+                }
+            ],
+            "name": "NFunctionDeclaration"
+        },
+        {
+            "children": [
+                {
+                    "name": "NIdentifier:int"
+                },
+                {
+                    "name": "NIdentifier:main"
+                }
+            ],
+            "name": "NFunctionDeclaration"
+        }
+    ],
     "name": "NBlock"
 }
