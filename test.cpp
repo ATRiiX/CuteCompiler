@@ -8,6 +8,7 @@
 #include <string>
 #include <typeinfo>
 #include <regex>
+
 using namespace std;
 using json = nlohmann::json;
 
@@ -41,15 +42,15 @@ int main(int argc, char **argv) {
                    {"value",    42.99}};
 
     // instead, you could also write (which looks very similar to the JSON above)
-     json children;
-     
-     children["list"] = {1, 0, 2};
- //   children.push_back(string("push_back test"));
-j["children"] = children;
+    json children;
 
-  //  string jsonFile = "new_tree.json";
-  //  std::ofstream outFile(jsonFile);
- //   outFile << std::setw(4) << j << std::endl;
+    children["list"] = {1, 0, 2};
+    //   children.push_back(string("push_back test"));
+    j["children"] = children;
+
+    //  string jsonFile = "new_tree.json";
+    //  std::ofstream outFile(jsonFile);
+    //   outFile << std::setw(4) << j << std::endl;
 
     std::cout << j.dump(4) << std::endl;
 }

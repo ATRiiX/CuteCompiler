@@ -17,7 +17,7 @@
 using namespace llvm;
 
 
-void ObjGen(CodeGenContext & context, const string& filename){
+void ObjGen(CodeGenContext &context, const string &filename) {
     // Initialize the target registry etc.
     InitializeAllTargetInfos();
     InitializeAllTargets();
@@ -31,7 +31,7 @@ void ObjGen(CodeGenContext & context, const string& filename){
     std::string error;
     auto Target = TargetRegistry::lookupTarget(targetTriple, error);
 
-    if( !Target ){
+    if (!Target) {
         errs() << error;
         return;
     }
@@ -54,7 +54,7 @@ void ObjGen(CodeGenContext & context, const string& filename){
     legacy::PassManager pass;
     auto fileType = TargetMachine::CGFT_ObjectFile;
 
-    if( theTargetMachine->addPassesToEmitFile(pass, dest, fileType) ){
+    if (theTargetMachine->addPassesToEmitFile(pass, dest, fileType)) {
         errs() << "theTargetMachine can't emit a file of this type";
         return;
     }

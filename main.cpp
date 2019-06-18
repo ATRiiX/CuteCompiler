@@ -5,7 +5,9 @@
 #include "CodeGen.h"
 #include "ObjGen.h"
 #include "json.hpp"
-extern shared_ptr<NBlock> programBlock;
+
+extern shared_ptr <NBlock> programBlock;
+
 extern int yyparse();
 // extern void yyparse_init(const char* filename);
 // extern void yyparse_cleanup();
@@ -26,7 +28,7 @@ int main(int argc, char **argv) {
 
     // std::cout << programBlock << std::endl;
     programBlock->print("--");
-    
+
 
 //    cout << root;
 
@@ -36,14 +38,11 @@ int main(int argc, char **argv) {
     context.generateCode(*programBlock);
     ObjGen(context);
 
-   
-   
-    
 
-     json j =programBlock->AST_JSON_Generate();
+    json j = programBlock->AST_JSON_Generate();
     string jsonFile = "new_tree.json";
     std::ofstream outFile(jsonFile);
     outFile << std::setw(4) << j << std::endl;
-cout << "new  json write to " << jsonFile << endl;
+    cout << "new  json write to " << jsonFile << endl;
     return 0;
 }
