@@ -54,9 +54,9 @@ public:
 
     virtual llvm::Value *codeGen(CodeGenContext &context) { return (llvm::Value *) 0; }
 
-    virtual json newjsonGen() const { return json(); }
+    virtual json AST_JSON_Generate() const { return json(); }
 
-    virtual Json::Value jsonGen() const { return Json::Value(); }
+   
 };
 
 class NExpression : public Node {
@@ -71,17 +71,13 @@ public:
         cout << prefix << getTypeName() << endl;
     }
 
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] = getTypeName();
         return j;
     }
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
-        return root;
-    }
+
 
 };
 
@@ -97,17 +93,13 @@ public:
         cout << prefix << getTypeName() << endl;
     }
 
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] = getTypeName();
         return j;
     }
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
-        return root;
-    }
+
 };
 
 class NDouble : public NExpression {
@@ -129,17 +121,13 @@ public:
         cout << prefix << getTypeName() << this->m_DELIM << value << endl;
     }
 
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] = getTypeName() + this->m_DELIM + std::to_string(value);
         return j;
     }
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName() + this->m_DELIM + std::to_string(value);
-        return root;
-    }
+
 
     virtual llvm::Value *codeGen(CodeGenContext &context) override;
 };
@@ -163,17 +151,13 @@ public:
         cout << prefix << getTypeName() << this->m_DELIM << value << endl;
     }
 
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] = getTypeName() + this->m_DELIM + std::to_string(value);
         return j;
     }
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName() + this->m_DELIM + std::to_string(value);
-        return root;
-    }
+
 
     operator NDouble() {
         return NDouble(value);
@@ -202,7 +186,7 @@ public:
         return className;
     }
 
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] = getTypeName() + this->m_DELIM + name + (isArray ? "(Array)" : "");
         bool flag = false;
@@ -213,7 +197,7 @@ public:
                 
               
             }
-            children.push_back((*it)->newjsonGen());
+            children.push_back((*it)->AST_JSON_Generate());
         }
         if(flag==true){
              j["children"] = children;
@@ -221,14 +205,7 @@ public:
         return j;
     }
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName() + this->m_DELIM + name + (isArray ? "(Array)" : "");
-        for (auto it = arraySize->begin(); it != arraySize->end(); it++) {
-            root["children"].append((*it)->jsonGen());
-        }
-        return root;
-    }
+
 
     void print(string prefix) const override {
         string nextPrefix = prefix + this->m_PREFIX;
@@ -267,28 +244,20 @@ public:
         return className;
     }
 
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] = getTypeName();
         json children;
        
-        children.push_back(this->id->newjsonGen());
+        children.push_back(this->id->AST_JSON_Generate());
         for (auto it = arguments->begin(); it != arguments->end(); it++) {
-            children.push_back((*it)->newjsonGen());
+            children.push_back((*it)->AST_JSON_Generate());
         }
          j["children"] = children;
         return j;
     }
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
-        root["children"].append(this->id->jsonGen());
-        for (auto it = arguments->begin(); it != arguments->end(); it++) {
-            root["children"].append((*it)->jsonGen());
-        }
-        return root;
-    }
+
 
     void print(string prefix) const override {
         string nextPrefix = prefix + this->m_PREFIX;
@@ -320,26 +289,17 @@ public:
     }
 
 
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] =getTypeName() + this->m_DELIM + std::to_string(op);
         json children;
         
-        children.push_back(lhs->newjsonGen());
-        children.push_back(rhs->newjsonGen());
+        children.push_back(lhs->AST_JSON_Generate());
+        children.push_back(rhs->AST_JSON_Generate());
         j["children"] = children;
         return j;
     }
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName() + this->m_DELIM + std::to_string(op);
-
-        root["children"].append(lhs->jsonGen());
-        root["children"].append(rhs->jsonGen());
-
-        return root;
-    }
 
     void print(string prefix) const override {
         string nextPrefix = prefix + this->m_PREFIX;
@@ -375,24 +335,18 @@ public:
         rhs->print(nextPrefix);
     }
 
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] =getTypeName() ;
         json children;
         
-        children.push_back(lhs->newjsonGen());
-        children.push_back(rhs->newjsonGen());
+        children.push_back(lhs->AST_JSON_Generate());
+        children.push_back(rhs->AST_JSON_Generate());
         j["children"] = children;
         return j;
     }
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
-        root["children"].append(lhs->jsonGen());
-        root["children"].append(rhs->jsonGen());
-        return root;
-    }
+
 
     virtual llvm::Value *codeGen(CodeGenContext &context) override;
 };
@@ -416,7 +370,7 @@ public:
             (*it)->print(nextPrefix);
         }
     }
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] = getTypeName() ;
         bool flag = false;
@@ -426,21 +380,14 @@ public:
                 flag = true;
 
             }
-            children.push_back((*it)->newjsonGen());
+            children.push_back((*it)->AST_JSON_Generate());
         }
         if(flag==true){
              j["children"] = children;
         }
         return j;
     }
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
-        for (auto it = statements->begin(); it != statements->end(); it++) {
-            root["children"].append((*it)->jsonGen());
-        }
-        return root;
-    }
+
 
     virtual llvm::Value *codeGen(CodeGenContext &context) override;
 };
@@ -466,22 +413,17 @@ public:
         expression->print(nextPrefix);
     }
 
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] =getTypeName() ;
         json children;
         
-        children.push_back(expression->newjsonGen());
+        children.push_back(expression->AST_JSON_Generate());
         j["children"] = children;
         return j;
     }
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
-        root["children"].append(expression->jsonGen());
-        return root;
-    }
+
 
     virtual llvm::Value *codeGen(CodeGenContext &context) override;
 };
@@ -517,30 +459,21 @@ public:
         }
     }
 
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] =getTypeName() ;
         json children;
         
-        children.push_back(type->newjsonGen());
-        children.push_back(id->newjsonGen());
+        children.push_back(type->AST_JSON_Generate());
+        children.push_back(id->AST_JSON_Generate());
         if (assignmentExpr != nullptr) {
-           children.push_back(assignmentExpr->newjsonGen());
+           children.push_back(assignmentExpr->AST_JSON_Generate());
         }
         j["children"] = children;
         return j;
     }
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
-        root["children"].append(type->jsonGen());
-        root["children"].append(id->jsonGen());
-        if (assignmentExpr != nullptr) {
-            root["children"].append(assignmentExpr->jsonGen());
-        }
-        return root;
-    }
+
 
     virtual llvm::Value *codeGen(CodeGenContext &context) override;
 };
@@ -583,43 +516,27 @@ public:
             block->print(nextPrefix);
     }
 
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] =getTypeName() ;
         json children;
         
-        children.push_back(type->newjsonGen());
-        children.push_back(id->newjsonGen());
+        children.push_back(type->AST_JSON_Generate());
+        children.push_back(id->AST_JSON_Generate());
 
         for (auto it = arguments->begin(); it != arguments->end(); it++) {
-           children.push_back((*it)->newjsonGen());
+           children.push_back((*it)->AST_JSON_Generate());
         }
 
         assert(isExternal || block != nullptr);
         if (block) {
-           children.push_back(block->newjsonGen());
+           children.push_back(block->AST_JSON_Generate());
         }
 j["children"] = children;
         return j;
     }
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
-        root["children"].append(type->jsonGen());
-        root["children"].append(id->jsonGen());
 
-        for (auto it = arguments->begin(); it != arguments->end(); it++) {
-            root["children"].append((*it)->jsonGen());
-        }
-
-        assert(isExternal || block != nullptr);
-        if (block) {
-            root["children"].append(block->jsonGen());
-        }
-
-        return root;
-    }
 
     virtual llvm::Value *codeGen(CodeGenContext &context) override;
 };
@@ -649,7 +566,7 @@ public:
         }
     }
 
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] = getTypeName() + this->m_DELIM + this->name->name;
         bool flag = false;
@@ -659,7 +576,7 @@ public:
                 flag = true;
 
             }
-            children.push_back((*it)->newjsonGen());
+            children.push_back((*it)->AST_JSON_Generate());
         }
         if(flag==true){
              j["children"] = children;
@@ -668,13 +585,7 @@ public:
     }
 
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName() + this->m_DELIM + this->name->name;
 
-        for (auto it = members->begin(); it != members->end(); it++) {
-            root["children"].append((*it)->jsonGen());
-        }
 
         return root;
     }
@@ -697,19 +608,14 @@ public:
         return className;
     }
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
-        root["children"].append(expression->jsonGen());
-        return root;
-    }
 
-    json newjsonGen() const override {
+
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] =getTypeName() ;
         json children;
         
-        children.push_back(expression->newjsonGen());
+        children.push_back(expression->AST_JSON_Generate());
         j["children"] = children;
         return j;
     }
@@ -758,26 +664,17 @@ public:
 
     }
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
-        root["children"].append(condition->jsonGen());
-        root["children"].append(trueBlock->jsonGen());
-        if (falseBlock) {
-            root["children"].append(falseBlock->jsonGen());
-        }
-        return root;
-    }
 
-    json newjsonGen() const override {
+
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] =getTypeName() ;
         json children;
        
-        children.push_back(condition->newjsonGen());
-        children.push_back(trueBlock->newjsonGen());
+        children.push_back(condition->AST_JSON_Generate());
+        children.push_back(trueBlock->AST_JSON_Generate());
         if (falseBlock) {
-            children.push_back(falseBlock->newjsonGen());
+            children.push_back(falseBlock->AST_JSON_Generate());
         }
          j["children"] = children;
         return j;
@@ -826,21 +723,21 @@ public:
     }
 
 
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] =getTypeName() ;
         json children;
        
         if (initial){
-children.push_back(initial->newjsonGen());
+children.push_back(initial->AST_JSON_Generate());
         }
            
         if (condition){
-             children.push_back(condition->newjsonGen());
+             children.push_back(condition->AST_JSON_Generate());
         }
             
         if (increment){
-             children.push_back(increment->newjsonGen());
+             children.push_back(increment->AST_JSON_Generate());
         }
             
          j["children"] = children;
@@ -848,19 +745,7 @@ children.push_back(initial->newjsonGen());
     }
 
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
 
-        if (initial)
-            root["children"].append(initial->jsonGen());
-        if (condition)
-            root["children"].append(condition->jsonGen());
-        if (increment)
-            root["children"].append(increment->jsonGen());
-
-        return root;
-    }
 
     llvm::Value *codeGen(CodeGenContext &context) override;
 
@@ -891,27 +776,19 @@ public:
         member->print(nextPrefix);
     }
 
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] =getTypeName() ;
         json children;
         
-        children.push_back(id->newjsonGen());
-        children.push_back(member->newjsonGen());
+        children.push_back(id->AST_JSON_Generate());
+        children.push_back(member->AST_JSON_Generate());
         j["children"] = children;
         return j;
     }
 
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
 
-        root["children"].append(id->jsonGen());
-        root["children"].append(member->jsonGen());
-
-        return root;
-    }
 
     llvm::Value *codeGen(CodeGenContext &context) override;
 
@@ -952,26 +829,16 @@ public:
 //        expression->print(nextPrefix);
     }
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
 
-        root["children"].append(arrayName->jsonGen());
-//        root["children"].append(expression->jsonGen());
-        for (auto it = expressions->begin(); it != expressions->end(); it++) {
-            root["children"].append((*it)->jsonGen());
-        }
-        return root;
-    }
 
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] =getTypeName() ;
         json children;
         
-        children.push_back(arrayName->newjsonGen());
+        children.push_back(arrayName->AST_JSON_Generate());
         for (auto it = expressions->begin(); it != expressions->end(); it++) {
-            children.push_back((*it)->newjsonGen());
+            children.push_back((*it)->AST_JSON_Generate());
         }
         j["children"] = children;
         return j;
@@ -1007,23 +874,15 @@ public:
     }
 
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
 
-        root["children"].append(arrayIndex->jsonGen());
-        root["children"].append(expression->jsonGen());
 
-        return root;
-    }
-
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] =getTypeName() ;
         json children;
        
-        children.push_back(arrayIndex->newjsonGen());
-        children.push_back(expression->newjsonGen());
+        children.push_back(arrayIndex->AST_JSON_Generate());
+        children.push_back(expression->AST_JSON_Generate());
          j["children"] = children;
         return j;
     }
@@ -1062,27 +921,18 @@ public:
     }
 
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
 
-        root["children"].append(declaration->jsonGen());
-        for (auto it = expressionList->begin(); it != expressionList->end(); it++)
-            root["children"].append((*it)->jsonGen());
 
-        return root;
-    }
-
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] =getTypeName() ;
         json children;
        
-        children.push_back(declaration->newjsonGen());
+        children.push_back(declaration->AST_JSON_Generate());
 
         for (auto it = expressionList->begin(); it != expressionList->end(); it++)
-             children.push_back((*it)->newjsonGen());
-     //   children.push_back(rhs->newjsonGen());
+             children.push_back((*it)->AST_JSON_Generate());
+     //   children.push_back(rhs->AST_JSON_Generate());
       j["children"] = children;
         return j;
     }
@@ -1118,23 +968,15 @@ public:
     }
 
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName();
 
-        root["children"].append(structMember->jsonGen());
-        root["children"].append(expression->jsonGen());
 
-        return root;
-    }
-
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] =getTypeName() ;
         json children;
         
-        children.push_back(structMember->newjsonGen());
-        children.push_back(expression->newjsonGen());
+        children.push_back(structMember->AST_JSON_Generate());
+        children.push_back(expression->AST_JSON_Generate());
         j["children"] = children;
         return j;
     }
@@ -1165,14 +1007,8 @@ public:
     }
 
 
-    Json::Value jsonGen() const override {
-        Json::Value root;
-        root["name"] = getTypeName() + this->m_DELIM + value;
 
-        return root;
-    }
-
-    json newjsonGen() const override {
+    json AST_JSON_Generate() const override {
         json j;
         j["name"] =getTypeName() + this->m_DELIM + value;
 

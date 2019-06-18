@@ -36,18 +36,12 @@ int main(int argc, char **argv) {
     context.generateCode(*programBlock);
     ObjGen(context);
 
-    auto root = programBlock->jsonGen();
    
-    string jsonFile = "old_tree.json";
-    std::ofstream astJson(jsonFile);
-    if( astJson.is_open() ){
-        astJson << root;
-        astJson.close();
-        cout << "old json write to " << jsonFile << endl;
-    }
+   
+    
 
-     json j =programBlock->newjsonGen();
-     jsonFile = "new_tree.json";
+     json j =programBlock->AST_JSON_Generate();
+    string jsonFile = "new_tree.json";
     std::ofstream outFile(jsonFile);
     outFile << std::setw(4) << j << std::endl;
 cout << "new  json write to " << jsonFile << endl;
