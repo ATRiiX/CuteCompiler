@@ -76,6 +76,7 @@ public:
     json AST_JSON_Generate() const override {
         json j;
         j["name"] = getClassName();
+        
         return j;
     }
 

@@ -16,6 +16,10 @@
 
 using namespace llvm;
 
+void ObjGen(CodeGenContext &context){
+    const string filename = "output.o";
+    ObjGen( context,filename);
+}
 
 void ObjGen(CodeGenContext &context, const string &filename) {
     // Initialize the target registry etc.
