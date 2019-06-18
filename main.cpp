@@ -14,7 +14,9 @@ extern int yyparse();
 //
 //void createCoreFunctions(CodeGenContext& context);
 
-
+//#include <iostream>
+//#include "CodeGen.h"
+//#include "ASTNodes2.h"
 
 using namespace std;
 using json = nlohmann::json;
@@ -27,6 +29,7 @@ int main(int argc, char **argv) {
     // std::cout << programBlock << std::endl;
     programBlock->print("--");
 
+    
 
 //    cout << root;
 
@@ -36,11 +39,15 @@ int main(int argc, char **argv) {
     context.generateCode(*programBlock);
     ObjGen(context);
 
+    
+    
+    
 
     json j = programBlock->AST_JSON_Generate();
     string jsonFile = "new_tree.json";
     std::ofstream outFile(jsonFile);
     outFile << std::setw(4) << j << std::endl;
     cout << "new  json write to " << jsonFile << endl;
+    
     return 0;
 }

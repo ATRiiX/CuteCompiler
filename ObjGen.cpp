@@ -21,7 +21,7 @@ void ObjGen(CodeGenContext &context){
     ObjGen( context,filename);
 }
 
-void ObjGen(CodeGenContext &context, const string &filename) {
+void ObjGen(CodeGenContext &context,  string filename) {
     // Initialize the target registry etc.
     InitializeAllTargetInfos();
     InitializeAllTargets();
