@@ -37,7 +37,7 @@ class NVariableDeclaration;
 typedef std::vector <shared_ptr<NStatement>> StatementList;
 typedef std::vector <shared_ptr<NExpression>> ExpressionList;
 typedef std::vector <shared_ptr<NVariableDeclaration>> VariableList;
-
+std::unique_ptr <NExpression> LogError(const char *str);
 class Node {
 protected:
     const char m_DELIM = ':';
@@ -1184,6 +1184,6 @@ public:
 };
 
 
-std::unique_ptr <NExpression> LogError(const char *str);
+
 
 #endif
