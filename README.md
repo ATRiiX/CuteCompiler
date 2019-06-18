@@ -9,7 +9,7 @@ sudo apt-get install libncurses-dev build-essential linux-headers-`uname -r` fle
 
 git clone https://github.com/ATRiiX/CuteCompiler.git         
 cd CuteCompiler     
-git pull    
+git fetch --all && git reset --hard origin/master && git pull 
 flex -o token.cpp token.l        
 #yacc -d grammar.y   #生成   y.tab.c              
 bison -d -o grammar.cpp grammar.y          

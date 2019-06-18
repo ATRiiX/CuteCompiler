@@ -48,7 +48,7 @@ public:
 
     virtual ~Node() {}
 
-    virtual string getTypeName() const { return className; };
+    virtual string getClassName() const { return className; };
 
     virtual void print(string prefix) const {}
 
@@ -63,17 +63,17 @@ class NExpression : public Node {
 public:
     NExpression() { className = __func__; }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     virtual void print(string prefix) const override {
-        cout << prefix << getTypeName() << endl;
+        cout << prefix << getClassName() << endl;
     }
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] = getTypeName();
+        j["name"] = getClassName();
         return j;
     }
 
@@ -85,17 +85,17 @@ class NStatement : public Node {
 public:
     NStatement() { className = __func__; }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     virtual void print(string prefix) const override {
-        cout << prefix << getTypeName() << endl;
+        cout << prefix << getClassName() << endl;
     }
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] = getTypeName();
+        j["name"] = getClassName();
         return j;
     }
 
@@ -113,17 +113,17 @@ public:
         // return "NDoub le=" << value << endl;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
-        cout << prefix << getTypeName() << this->m_DELIM << value << endl;
+        cout << prefix << getClassName() << this->m_DELIM << value << endl;
     }
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] = getTypeName() + this->m_DELIM + std::to_string(value);
+        j["name"] = getClassName() + this->m_DELIM + std::to_string(value);
         return j;
     }
 
@@ -143,17 +143,17 @@ public:
 
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
-        cout << prefix << getTypeName() << this->m_DELIM << value << endl;
+        cout << prefix << getClassName() << this->m_DELIM << value << endl;
     }
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] = getTypeName() + this->m_DELIM + std::to_string(value);
+        j["name"] = getClassName() + this->m_DELIM + std::to_string(value);
         return j;
     }
 
@@ -182,13 +182,13 @@ public:
         // return "NIdentifier=" << name << endl;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] = getTypeName() + this->m_DELIM + name + (isArray ? "(Array)" : "");
+        j["name"] = getClassName() + this->m_DELIM + name + (isArray ? "(Array)" : "");
         bool flag = false;
         json children;
         for (auto it = arraySize->begin(); it != arraySize->end(); it++) {
@@ -209,7 +209,7 @@ public:
 
     void print(string prefix) const override {
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << name << (isArray ? "(Array)" : "") << endl;
+        cout << prefix << getClassName() << this->m_DELIM << name << (isArray ? "(Array)" : "") << endl;
         if (isArray && arraySize->size() > 0) {
 //            assert(arraySize != nullptr);
             for (auto it = arraySize->begin(); it != arraySize->end(); it++) {
@@ -240,13 +240,13 @@ public:
         className = __func__;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] = getTypeName();
+        j["name"] = getClassName();
         json children;
        
         children.push_back(this->id->AST_JSON_Generate());
@@ -261,7 +261,7 @@ public:
 
     void print(string prefix) const override {
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << endl;
+        cout << prefix << getClassName() << this->m_DELIM << endl;
         this->id->print(nextPrefix);
         for (auto it = arguments->begin(); it != arguments->end(); it++) {
             (*it)->print(nextPrefix);
@@ -284,14 +284,14 @@ public:
         className = __func__;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] =getTypeName() + this->m_DELIM + std::to_string(op);
+        j["name"] =getClassName() + this->m_DELIM + std::to_string(op);
         json children;
         
         children.push_back(lhs->AST_JSON_Generate());
@@ -303,7 +303,7 @@ public:
 
     void print(string prefix) const override {
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << op << endl;
+        cout << prefix << getClassName() << this->m_DELIM << op << endl;
 
         lhs->print(nextPrefix);
         rhs->print(nextPrefix);
@@ -324,20 +324,20 @@ public:
         className = __func__;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << endl;
+        cout << prefix << getClassName() << this->m_DELIM << endl;
         lhs->print(nextPrefix);
         rhs->print(nextPrefix);
     }
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] =getTypeName() ;
+        j["name"] =getClassName() ;
         json children;
         
         children.push_back(lhs->AST_JSON_Generate());
@@ -359,20 +359,20 @@ public:
         className = __func__;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << endl;
+        cout << prefix << getClassName() << this->m_DELIM << endl;
         for (auto it = statements->begin(); it != statements->end(); it++) {
             (*it)->print(nextPrefix);
         }
     }
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] = getTypeName() ;
+        j["name"] = getClassName() ;
         bool flag = false;
          json children;
         for (auto it = statements->begin(); it != statements->end(); it++) {
@@ -403,19 +403,19 @@ public:
         className = __func__;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << endl;
+        cout << prefix << getClassName() << this->m_DELIM << endl;
         expression->print(nextPrefix);
     }
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] =getTypeName() ;
+        j["name"] =getClassName() ;
         json children;
         
         children.push_back(expression->AST_JSON_Generate());
@@ -445,13 +445,13 @@ public:
         assert(!type->isArray || (type->isArray && type->arraySize != nullptr));
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << endl;
+        cout << prefix << getClassName() << this->m_DELIM << endl;
         type->print(nextPrefix);
         id->print(nextPrefix);
         if (assignmentExpr != nullptr) {
@@ -461,7 +461,7 @@ public:
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] =getTypeName() ;
+        j["name"] =getClassName() ;
         json children;
         
         children.push_back(type->AST_JSON_Generate());
@@ -496,13 +496,13 @@ public:
         assert(type->isType);
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << endl;
+        cout << prefix << getClassName() << this->m_DELIM << endl;
 
         type->print(nextPrefix);
         id->print(nextPrefix);
@@ -518,7 +518,7 @@ public:
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] =getTypeName() ;
+        j["name"] =getClassName() ;
         json children;
         
         children.push_back(type->AST_JSON_Generate());
@@ -553,13 +553,13 @@ public:
         className = __func__;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << this->name->name << endl;
+        cout << prefix << getClassName() << this->m_DELIM << this->name->name << endl;
 
         for (auto it = members->begin(); it != members->end(); it++) {
             (*it)->print(nextPrefix);
@@ -568,7 +568,7 @@ public:
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] = getTypeName() + this->m_DELIM + this->name->name;
+        j["name"] = getClassName() + this->m_DELIM + this->name->name;
         bool flag = false;
         json children;
         for (auto it = members->begin(); it != members->end(); it++) {
@@ -587,7 +587,7 @@ public:
 
 
 
-        return root;
+    
     }
 
     virtual llvm::Value *codeGen(CodeGenContext &context) override;
@@ -604,7 +604,7 @@ public:
         className = __func__;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
@@ -612,7 +612,7 @@ public:
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] =getTypeName() ;
+        j["name"] =getClassName() ;
         json children;
         
         children.push_back(expression->AST_JSON_Generate());
@@ -622,7 +622,7 @@ public:
 
     void print(string prefix) const override {
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << endl;
+        cout << prefix << getClassName() << this->m_DELIM << endl;
 
         expression->print(nextPrefix);
     }
@@ -646,13 +646,13 @@ public:
         className = __func__;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << endl;
+        cout << prefix << getClassName() << this->m_DELIM << endl;
 
         condition->print(nextPrefix);
 
@@ -668,7 +668,7 @@ public:
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] =getTypeName() ;
+        j["name"] =getClassName() ;
         json children;
        
         children.push_back(condition->AST_JSON_Generate());
@@ -703,14 +703,14 @@ public:
         }
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
 
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << endl;
+        cout << prefix << getClassName() << this->m_DELIM << endl;
 
         if (initial)
             initial->print(nextPrefix);
@@ -725,7 +725,7 @@ public:
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] =getTypeName() ;
+        j["name"] =getClassName() ;
         json children;
        
         if (initial){
@@ -763,14 +763,14 @@ public:
         className = __func__;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
 
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << endl;
+        cout << prefix << getClassName() << this->m_DELIM << endl;
 
         id->print(nextPrefix);
         member->print(nextPrefix);
@@ -778,7 +778,7 @@ public:
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] =getTypeName() ;
+        j["name"] =getClassName() ;
         json children;
         
         children.push_back(id->AST_JSON_Generate());
@@ -814,13 +814,13 @@ public:
         className = __func__;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << endl;
+        cout << prefix << getClassName() << this->m_DELIM << endl;
 
         arrayName->print(nextPrefix);
         for (auto it = expressions->begin(); it != expressions->end(); it++) {
@@ -833,7 +833,7 @@ public:
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] =getTypeName() ;
+        j["name"] =getClassName() ;
         json children;
         
         children.push_back(arrayName->AST_JSON_Generate());
@@ -860,14 +860,14 @@ public:
         className = __func__;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
 
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << endl;
+        cout << prefix << getClassName() << this->m_DELIM << endl;
 
         arrayIndex->print(nextPrefix);
         expression->print(nextPrefix);
@@ -878,7 +878,7 @@ public:
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] =getTypeName() ;
+        j["name"] =getClassName() ;
         json children;
        
         children.push_back(arrayIndex->AST_JSON_Generate());
@@ -905,14 +905,14 @@ public:
         className = __func__;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
 
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << endl;
+        cout << prefix << getClassName() << this->m_DELIM << endl;
 
         declaration->print(nextPrefix);
         for (auto it = expressionList->begin(); it != expressionList->end(); it++) {
@@ -925,7 +925,7 @@ public:
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] =getTypeName() ;
+        j["name"] =getClassName() ;
         json children;
        
         children.push_back(declaration->AST_JSON_Generate());
@@ -954,14 +954,14 @@ public:
         className = __func__;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
 
         string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getTypeName() << this->m_DELIM << endl;
+        cout << prefix << getClassName() << this->m_DELIM << endl;
 
         structMember->print(nextPrefix);
         expression->print(nextPrefix);
@@ -972,7 +972,7 @@ public:
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] =getTypeName() ;
+        j["name"] =getClassName() ;
         json children;
         
         children.push_back(structMember->AST_JSON_Generate());
@@ -996,13 +996,13 @@ public:
         className = __func__;
     }
 
-    string getTypeName() const override {
+    string getClassName() const override {
         return className;
     }
 
     void print(string prefix) const override {
 
-        cout << prefix << getTypeName() << this->m_DELIM << value << endl;
+        cout << prefix << getClassName() << this->m_DELIM << value << endl;
 
     }
 
@@ -1010,7 +1010,7 @@ public:
 
     json AST_JSON_Generate() const override {
         json j;
-        j["name"] =getTypeName() + this->m_DELIM + value;
+        j["name"] =getClassName() + this->m_DELIM + value;
 
         return j;
     }
