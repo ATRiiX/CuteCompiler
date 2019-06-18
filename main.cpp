@@ -27,7 +27,11 @@ int main(int argc, char **argv) {
     yyparse();
 
     // std::cout << programBlock << std::endl;
-    programBlock->print("--");
+   // programBlock->print("--");
+
+    json j = programBlock->AST_JSON_Generate();
+
+    std::cout << j.dump(4) << std::endl;
 
     
 
@@ -40,14 +44,13 @@ int main(int argc, char **argv) {
     ObjGen(context);
 
     
-    
-    
-
-    json j = programBlock->AST_JSON_Generate();
-    string jsonFile = "new_tree.json";
+    string jsonFile = "AST.json";
     std::ofstream outFile(jsonFile);
     outFile << std::setw(4) << j << std::endl;
-    cout << "new  json write to " << jsonFile << endl;
+    cout << "AST json write to " << jsonFile << endl;
+    
+
+    
     
     return 0;
 }

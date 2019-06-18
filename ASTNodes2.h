@@ -43,7 +43,6 @@ std::unique_ptr <NExpression> LogError(const char *str);
 class Node {
 protected:
     const char m_DELIM = ':';
-    const char *m_PREFIX = "--";
     string className;
 public:
     Node() { className = __func__; }
@@ -52,7 +51,7 @@ public:
 
     virtual string getClassName() const { return className; };
 
-    virtual void print(string prefix) const {}
+
 
     virtual llvm::Value *codeGen(CodeGenContext &context) { return (llvm::Value *) 0; }
 
@@ -69,9 +68,7 @@ public:
         return className;
     }
 
-    virtual void print(string prefix) const override {
-        cout << prefix << getClassName() << endl;
-    }
+
 
     json AST_JSON_Generate() const override {
         json j;
@@ -91,9 +88,7 @@ public:
         return className;
     }
 
-    virtual void print(string prefix) const override {
-        cout << prefix << getClassName() << endl;
-    }
+
 
     json AST_JSON_Generate() const override {
         json j;
@@ -119,9 +114,7 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
-        cout << prefix << getClassName() << this->m_DELIM << value << endl;
-    }
+
 
     json AST_JSON_Generate() const override {
         json j;
@@ -148,9 +141,7 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
-        cout << prefix << getClassName() << this->m_DELIM << value << endl;
-    }
+
 
     json AST_JSON_Generate() const override {
         json j;
@@ -194,8 +185,6 @@ public:
         for (auto it = arraySize->begin(); it != arraySize->end(); it++) {
             if (flag == false) {
                 flag = true;
-
-
             }
             children.push_back((*it)->AST_JSON_Generate());
         }
@@ -205,17 +194,6 @@ public:
         return j;
     }
 
-
-    void print(string prefix) const override {
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << name << (isArray ? "(Array)" : "") << endl;
-        if (isArray && arraySize->size() > 0) {
-//            assert(arraySize != nullptr);
-            for (auto it = arraySize->begin(); it != arraySize->end(); it++) {
-                (*it)->print(nextPrefix);
-            }
-        }
-    }
 
     virtual llvm::Value *codeGen(CodeGenContext &context) override;
 };
@@ -257,14 +235,7 @@ public:
     }
 
 
-    void print(string prefix) const override {
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << endl;
-        this->id->print(nextPrefix);
-        for (auto it = arguments->begin(); it != arguments->end(); it++) {
-            (*it)->print(nextPrefix);
-        }
-    }
+
 
     virtual llvm::Value *codeGen(CodeGenContext &context) override;
 };
@@ -299,13 +270,7 @@ public:
     }
 
 
-    void print(string prefix) const override {
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << op << endl;
 
-        lhs->print(nextPrefix);
-        rhs->print(nextPrefix);
-    }
 
     virtual llvm::Value *codeGen(CodeGenContext &context) override;
 };
@@ -326,12 +291,6 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << endl;
-        lhs->print(nextPrefix);
-        rhs->print(nextPrefix);
-    }
 
     json AST_JSON_Generate() const override {
         json j;
@@ -360,15 +319,9 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << endl;
-        for (auto it = statements->begin(); it != statements->end(); it++) {
-            (*it)->print(nextPrefix);
-        }
-    }
 
     json AST_JSON_Generate() const override {
+        cout<<"AST JSON Generate start!!"<<endl;
         json j;
         j["name"] = getClassName();
         bool flag = false;
@@ -376,7 +329,6 @@ public:
         for (auto it = statements->begin(); it != statements->end(); it++) {
             if (flag == false) {
                 flag = true;
-
             }
             children.push_back((*it)->AST_JSON_Generate());
         }
@@ -405,11 +357,7 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << endl;
-        expression->print(nextPrefix);
-    }
+
 
     json AST_JSON_Generate() const override {
         json j;
@@ -446,15 +394,6 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << endl;
-        type->print(nextPrefix);
-        id->print(nextPrefix);
-        if (assignmentExpr != nullptr) {
-            assignmentExpr->print(nextPrefix);
-        }
-    }
 
     json AST_JSON_Generate() const override {
         json j;
@@ -496,21 +435,6 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << endl;
-
-        type->print(nextPrefix);
-        id->print(nextPrefix);
-
-        for (auto it = arguments->begin(); it != arguments->end(); it++) {
-            (*it)->print(nextPrefix);
-        }
-
-        assert(isExternal || block != nullptr);
-        if (block)
-            block->print(nextPrefix);
-    }
 
     json AST_JSON_Generate() const override {
         json j;
@@ -552,14 +476,7 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << this->name->name << endl;
 
-        for (auto it = members->begin(); it != members->end(); it++) {
-            (*it)->print(nextPrefix);
-        }
-    }
 
     json AST_JSON_Generate() const override {
         json j;
@@ -609,12 +526,7 @@ public:
         return j;
     }
 
-    void print(string prefix) const override {
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << endl;
 
-        expression->print(nextPrefix);
-    }
 
     virtual llvm::Value *codeGen(CodeGenContext &context) override;
 
@@ -639,19 +551,6 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << endl;
-
-        condition->print(nextPrefix);
-
-        trueBlock->print(nextPrefix);
-
-        if (falseBlock) {
-            falseBlock->print(nextPrefix);
-        }
-
-    }
 
 
     json AST_JSON_Generate() const override {
@@ -695,20 +594,6 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
-
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << endl;
-
-        if (initial)
-            initial->print(nextPrefix);
-        if (condition)
-            condition->print(nextPrefix);
-        if (increment)
-            increment->print(nextPrefix);
-
-        block->print(nextPrefix);
-    }
 
 
     json AST_JSON_Generate() const override {
@@ -753,14 +638,7 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
 
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << endl;
-
-        id->print(nextPrefix);
-        member->print(nextPrefix);
-    }
 
     json AST_JSON_Generate() const override {
         json j;
@@ -802,16 +680,6 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << endl;
-
-        arrayName->print(nextPrefix);
-        for (auto it = expressions->begin(); it != expressions->end(); it++) {
-            (*it)->print(nextPrefix);
-        }
-//        expression->print(nextPrefix);
-    }
 
 
     json AST_JSON_Generate() const override {
@@ -847,14 +715,6 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
-
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << endl;
-
-        arrayIndex->print(nextPrefix);
-        expression->print(nextPrefix);
-    }
 
 
     json AST_JSON_Generate() const override {
@@ -890,16 +750,6 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
-
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << endl;
-
-        declaration->print(nextPrefix);
-        for (auto it = expressionList->begin(); it != expressionList->end(); it++) {
-            (*it)->print(nextPrefix);
-        }
-    }
 
 
     json AST_JSON_Generate() const override {
@@ -937,14 +787,6 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
-
-        string nextPrefix = prefix + this->m_PREFIX;
-        cout << prefix << getClassName() << this->m_DELIM << endl;
-
-        structMember->print(nextPrefix);
-        expression->print(nextPrefix);
-    }
 
 
     json AST_JSON_Generate() const override {
@@ -977,11 +819,7 @@ public:
         return className;
     }
 
-    void print(string prefix) const override {
-
-        cout << prefix << getClassName() << this->m_DELIM << value << endl;
-
-    }
+ 
 
 
     json AST_JSON_Generate() const override {
