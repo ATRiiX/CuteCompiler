@@ -38,8 +38,5 @@ int main(int argc, char **argv) {
     outFile << std::setw(4) << j << std::endl;
     cout << "AST json write to " << jsonFile << endl;
     
-
-    
-    
     return 0;
 }
