@@ -23,18 +23,12 @@ using json = nlohmann::json;
 int main(int argc, char **argv) {
     yyparse();
 
-    // std::cout << programBlock << std::endl;
-   // programBlock->print("--");
-
+    cout<<"AST JSON Generate start!!"<<endl;
     json j = programBlock->AST_JSON_Generate();
-
     std::cout << j.dump(4) << std::endl;
 
-    
 
-//    cout << root;
 
-//    cout << root << endl;
     CodeGenContext context;
 //    createCoreFunctions(context);
     context.generateCode(*programBlock);

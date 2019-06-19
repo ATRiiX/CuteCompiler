@@ -321,7 +321,7 @@ public:
 
 
     json AST_JSON_Generate() const override {
-        cout<<"AST JSON Generate start!!"<<endl;
+        
         json j;
         j["name"] = getClassName();
         bool flag = false;
