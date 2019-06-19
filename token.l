@@ -25,6 +25,8 @@ static FILE* yyparse_file_ptr;
 
 %%
 
+"/*"([^\*]|(\*)*[^\*/])*(\*)*"*/" ; /* 多行注释 */ 
+
 "//".*                                    { /* consume //-comment */ }
 "#".*                   ;
 [ \t\r\n]				;
