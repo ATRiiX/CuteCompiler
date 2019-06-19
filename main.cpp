@@ -9,9 +9,6 @@
 extern shared_ptr <NBlock> programBlock;
 
 extern int yyparse();
-// extern void yyparse_init(const char* filename);
-// extern void yyparse_cleanup();
-//
 //void createCoreFunctions(CodeGenContext& context);
 
 //#include <iostream>

@@ -385,7 +385,7 @@ public:
                          shared_ptr <NExpression> assignmentExpr = NULL)
             : type(type), id(id), assignmentExpr(assignmentExpr) {
         className = __func__;
-        cout << "isArray = " << type->isArray << endl;
+    //    cout << "isArray = " << type->isArray << endl;
         assert(type->isType);
         assert(!type->isArray || (type->isArray && type->arraySize != nullptr));
     }
