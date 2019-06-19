@@ -22,6 +22,8 @@ void ObjGen(CodeGenContext &context){
 }
 
 void ObjGen(CodeGenContext &context,  string filename) {
+
+     outs() << "Object code start generate " <<  "\n";
     // Initialize the target registry etc.
     InitializeAllTargetInfos();
     InitializeAllTargets();
@@ -68,6 +70,12 @@ void ObjGen(CodeGenContext &context,  string filename) {
 
     outs() << "Object code wrote to " << filename.c_str() << "\n";
 
+
+    llvm_shutdown();
+
+
+
+    
     return;
 }
 
