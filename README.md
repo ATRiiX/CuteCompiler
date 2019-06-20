@@ -21,7 +21,7 @@ g++ -c `llvm-config-3.9 --cppflags` -std=c++11 -o ObjGen.o ObjGen.cpp
 g++ -c `llvm-config-3.9 --cppflags` -std=c++11 -o TypeSystem.o TypeSystem.cpp          
 g++ `llvm-config-3.9 --cppflags` -std=c++11 -o compiler grammar.o token.o CodeGen.o main.o ObjGen.o TypeSystem.o  `llvm-config-3.9 --libs` `llvm-config-3.9 --ldflags` -lpthread -ldl -lz -lncurses -rdynamic -L/usr/local/lib -ljsoncpp          
 
-rm *.o compiler grammar.cpp token.cpp test grammar.hpp
+rm *.o compiler grammar.cpp token.cpp test 
 ```
 
 我们的编译器支持#单行注释和//单行注释
