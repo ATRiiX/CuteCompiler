@@ -1,3 +1,23 @@
+ #include "llvm/Analysis/AssumptionCache.h"
+ #include "llvm/Analysis/InlineCost.h"
+ #include "llvm/Analysis/ProfileSummaryInfo.h"
+ #include "llvm/Analysis/TargetLibraryInfo.h"
+ #include "llvm/Analysis/TargetTransformInfo.h"
+ #include "llvm/IR/CallSite.h"
+ #include "llvm/IR/CallingConv.h"
+ #include "llvm/IR/DataLayout.h"
+ #include "llvm/IR/Instructions.h"
+ #include "llvm/IR/Module.h"
+ #include "llvm/IR/Type.h"
+ #include "llvm/Transforms/IPO.h"
+
+
+
+
+
+
+
+
 
 #include <llvm/IR/Value.h>
 #include <llvm/IR/LLVMContext.h>
@@ -5,7 +25,35 @@
 #include <llvm/IR/Module.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/IRPrintingPasses.h>
+#include "llvm/Pass.h"
+#include "llvm/IR/Function.h"
+#include "llvm/Support/raw_ostream.h"
 #include <llvm/Support/raw_ostream.h>
+#include "llvm/ADT/iterator_range.h"
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/ExecutionEngine/JITSymbolFlags.h"
+#include "llvm/ExecutionEngine/RTDyldMemoryManager.h"
+#include "llvm/ExecutionEngine/RuntimeDyld.h"
+#include "llvm/ExecutionEngine/SectionMemoryManager.h"
+#include "llvm/ExecutionEngine/Orc/CompileUtils.h"
+#include "llvm/ExecutionEngine/Orc/JITSymbol.h"
+#include "llvm/ExecutionEngine/Orc/IRCompileLayer.h"
+#include "llvm/ExecutionEngine/Orc/LambdaResolver.h"
+#include "llvm/ExecutionEngine/Orc/ObjectLinkingLayer.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/Mangler.h"
+#include "llvm/Support/DynamicLibrary.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/Target/TargetMachine.h"
+
+
+
+#include "llvm/Transforms/IPO/PassManagerBuilder.h"
+
+
+
+
 //#include <llvm/IR/Verifier.h>
 #include "CodeGen.h"
 #include "ASTNodes2.h"
@@ -69,6 +117,7 @@ static llvm::Value *calcArrayIndex(shared_ptr<NArrayIndex> index, CodeGenContext
 
 void CodeGenContext::generateCode(NBlock &root)
 {
+    using namespace llvm;
     cout << "Generating IR code" << endl;
 
     std::vector<Type *> sysArgs;
@@ -82,9 +131,28 @@ void CodeGenContext::generateCode(NBlock &root)
 
     cout << "Code generate success" << endl;
     cout << "IR Code  is :" << endl;
-    PassManager passManager;
-    passManager.add(createPrintModulePass(outs()));
-    passManager.run(*(this->theModule.get()));
+    
+  //  llvm::legacy::PassManager passManager;
+  //  passManager.add(createPrintModulePass(outs()));
+  //  passManager.run(*(this->theModule.get()));
+
+    llvm::legacy::PassManager *pm = new llvm::legacy::PassManager();
+    int optLevel = 3;
+    int sizeLevel = 0;
+    PassManagerBuilder builder;
+    builder.OptLevel = optLevel;
+    builder.SizeLevel = sizeLevel;
+    builder.Inliner = createFunctionInliningPass(optLevel, sizeLevel);
+    builder.DisableUnitAtATime = false;
+    builder.DisableUnrollLoops = false;
+    builder.LoopVectorize = true;
+    builder.SLPVectorize = true;
+    builder.populateModulePassManager(*pm);
+
+    (*pm).add(createPrintModulePass(outs()));
+    (*pm).run(*(this->theModule.get()));
+
+
     return;
 }
 

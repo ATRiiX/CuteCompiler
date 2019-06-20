@@ -14,13 +14,30 @@
 #include "CodeGen.h"
 #include "ObjGen.h"
 
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+
+using namespace std;
 using namespace llvm;
 
 void ObjGen(CodeGenContext &context){
     const string filename = "output.o";
     ObjGen( context,filename);
 }
+void system_call_clang(string inputfilename,string outputfilename) {
 
+    string clang = "clang++ -O3 -o";
+ //   string inputfilename = "output.o";
+ //   string outputfilename = "test";
+    string tab="  ";
+    string command=clang+tab+outputfilename+tab+inputfilename;
+    cout<<"run command:  "<<command<<endl;
+    system(command.c_str());
+   // system("clang++ -O3  output.o -o test ");
+
+}
 void ObjGen(CodeGenContext &context,  string filename) {
 
      outs() << "Object code start generate " <<  "\n";
@@ -73,7 +90,7 @@ void ObjGen(CodeGenContext &context,  string filename) {
 
     llvm_shutdown();
 
-
+    system_call_clang(filename, "test");
 
     
     return;
