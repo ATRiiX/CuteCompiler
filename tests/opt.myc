@@ -1,0 +1,19 @@
+extern int printf(string str)
+extern int puts(string str)
+//this is a comment
+#this is a comment
+int main(){
+    int i =0
+    int j =0
+    int k
+    if(1<2){
+    	i=1
+    }
+    if(2>1){
+    i=2
+    }
+
+
+
+    return 0
+}
