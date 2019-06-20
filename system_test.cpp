@@ -9,6 +9,7 @@ g++ -o system_test system_test.cpp
 ./test
 */
 using namespace std;
+using string=std::string;
 int main(int argc, char **argv) {
     string command = "clang++ -O3 -o";
     string inputfilename = "output.o";
