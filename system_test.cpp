@@ -1,9 +1,9 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <iostream>
 /*
-rm test
+rm test system_test
 g++ -o system_test system_test.cpp
 ./system_test
 ./test
