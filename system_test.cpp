@@ -11,9 +11,9 @@ g++ -o system_test system_test.cpp
 using namespace std;
 using string=std::string;
 int main(int argc, char **argv) {
-    string command = "clang++ -O3 -o";
-    string inputfilename = "output.o";
-    string outputfilename = "test";
+    string command = "clang++ -O3 -o ";
+    string inputfilename = " output.o";
+    string outputfilename = " test";
     system((command+outputfilename+inputfilename).c_str());
    // system("clang++ -O3  output.o -o test ");
     return 0;
