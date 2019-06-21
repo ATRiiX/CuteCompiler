@@ -1,15 +1,11 @@
 extern int printf(string format)
 extern int puts(string s)
-//this is a comment
-#this is a comment
 int test(){
 	return 5+3
 }
 int main(){
-    int i =0
-    int j =0
-    int k
-    
+    int i,j,k
+  
     if(1<2){
     	i=1
     }
