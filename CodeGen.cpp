@@ -57,7 +57,7 @@
 //#include <llvm/IR/Verifier.h>
 #include "CodeGen.h"
 #include "ASTNodes2.h"
-#include "TypeSystem.h"
+
 
 using legacy::PassManager;
 #define ISTYPE(value, id) (value->getType()->getTypeID() == id)
@@ -107,9 +107,9 @@ static llvm::Value *calcArrayIndex(shared_ptr<NArrayIndex> index, CodeGenContext
     {
         auto temp = make_shared<NBinaryOperator>(make_shared<NInteger>(sizeVec[i]), TMUL,
                                                  index->expressions->at(i - 1));
-        //        cout << "2" << endl;
+
         expression = make_shared<NBinaryOperator>(temp, TPLUS, expression);
-        //        cout << "3" << endl;
+
     }
 
     return expression->codeGen(context);
@@ -137,18 +137,18 @@ void CodeGenContext::generateCode(NBlock &root)
   //  passManager.run(*(this->theModule.get()));
 
     llvm::legacy::PassManager *pm = new llvm::legacy::PassManager();
-    int optLevel = 3;
-    int sizeLevel = 0;
+    int optLevel = 3;//优化级别 0-3 3最高
+    int sizeLevel = 0;//大小优化 0是无 2最大
     PassManagerBuilder builder;
     builder.OptLevel = optLevel;
     builder.SizeLevel = sizeLevel;
     builder.Inliner = createFunctionInliningPass(optLevel, sizeLevel);
     builder.DisableUnitAtATime = false;
-    builder.DisableUnrollLoops = false;
-    builder.LoopVectorize = true;
-    builder.SLPVectorize = true;
+    builder.DisableUnrollLoops = false;//If True, disable loop unrolling.
+    builder.LoopVectorize = true;//allow vectorizing loops
+    builder.SLPVectorize = true;//If True, enable the SLP vectorizer, which uses a different algorithm than the loop vectorizer. Both may be enabled at the same time.
     builder.populateModulePassManager(*pm);
-
+  //  builder.DisableTailCalls
     (*pm).add(createPrintModulePass(outs()));
     (*pm).run(*(this->theModule.get()));
 
