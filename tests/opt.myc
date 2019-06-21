@@ -1,4 +1,5 @@
-
+extern int printf(string format)
+extern int puts(string s)
 //this is a comment
 #this is a comment
 int test(){
@@ -15,8 +16,11 @@ int main(){
     //Dead Code Elimination
 		j=2
 		j=3
+		//Constant Folding
 		k=test()
-
+		
+		printf("i=%d,j=%d,k=%d", i,j,k)
+    puts("")
 
     return 0
 }
