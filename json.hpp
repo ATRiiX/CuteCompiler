@@ -8810,7 +8810,7 @@ class json_pointer
                     {
                         result = &result->operator[](static_cast<size_type>(array_index(reference_token)));
                     }
-                    JSON_CATCH(std::logic_error&)
+                    JSON_CATCH(std::invalid_argument&)
                     {
                         JSON_THROW(detail::parse_error::create(109, 0, "array index '" + reference_token + "' is not a number"));
                     }
@@ -8904,7 +8904,7 @@ class json_pointer
                             ptr = &ptr->operator[](
                                 static_cast<size_type>(array_index(reference_token)));
                         }
-                        JSON_CATCH(std::logic_error&)
+                        JSON_CATCH(std::invalid_argument&)
                         {
                             JSON_THROW(detail::parse_error::create(109, 0, "array index '" + reference_token + "' is not a number"));
                         }
@@ -8963,7 +8963,7 @@ class json_pointer
                     {
                         ptr = &ptr->at(static_cast<size_type>(array_index(reference_token)));
                     }
-                    JSON_CATCH(std::logic_error&)
+                    JSON_CATCH(std::invalid_argument&)
                     {
                         JSON_THROW(detail::parse_error::create(109, 0, "array index '" + reference_token + "' is not a number"));
                     }
@@ -9029,7 +9029,7 @@ class json_pointer
                         ptr = &ptr->operator[](
                             static_cast<size_type>(array_index(reference_token)));
                     }
-                    JSON_CATCH(std::logic_error&)
+                    JSON_CATCH(std::invalid_argument&)
                     {
                         JSON_THROW(detail::parse_error::create(109, 0, "array index '" + reference_token + "' is not a number"));
                     }
@@ -9087,7 +9087,7 @@ class json_pointer
                     {
                         ptr = &ptr->at(static_cast<size_type>(array_index(reference_token)));
                     }
-                    JSON_CATCH(std::logic_error&)
+                    JSON_CATCH(std::invalid_argument&)
                     {
                         JSON_THROW(detail::parse_error::create(109, 0, "array index '" + reference_token + "' is not a number"));
                     }
