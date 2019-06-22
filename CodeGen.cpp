@@ -1,5 +1,6 @@
 #include "CodeGen.h"
 #include "ASTNodes2.h"
+#include <assert.h>
 #include "llvm/IR/CallSite.h"
 #include "llvm/IR/CallingConv.h"
 #include "llvm/IR/DataLayout.h"
@@ -73,7 +74,11 @@ static llvm::Value *calcArrayIndex(shared_ptr<NArrayIndex> index, CodeGenContext
 {
     auto sizeVec = context.getArraySize(index->arrayName->name);
     cout << "sizeVec:" << sizeVec.size() << ", expressions: " << index->expressions->size() << endl;
-    assert(sizeVec.size() > 0 && sizeVec.size() == index->expressions->size());
+    if (!(sizeVec.size() > 0 && sizeVec.size() == index->expressions->size()))
+    {
+        throw std::invalid_argument("!(sizeVec.size() > 0 && sizeVec.size() == index->expressions->size())");
+    }
+ 
     auto expression = *(index->expressions->rbegin());
 
     for (unsigned int i = sizeVec.size() - 1; i >= 1; i--)
@@ -543,7 +548,10 @@ llvm::Value *NArrayIndex::codeGen(CodeGenContext &context)
     auto type = context.getSymbolType(this->arrayName->name);
     string typeStr = type->name;
 
-    assert(type->isArray);
+    if (type->isArray == false)
+    {
+        throw std::invalid_argument("type.isArray is false");
+    }
 
     auto value = calcArrayIndex(make_shared<NArrayIndex>(*this), context);
     ArrayRef<Value *> indices;
@@ -598,8 +606,10 @@ llvm::Value *NArrayInitialization::codeGen(CodeGenContext &context)
     cout << "Generating array initialization of " << this->declaration->id->name << endl;
     auto arrayPtr = this->declaration->codeGen(context);
     auto sizeVec = context.getArraySize(this->declaration->id->name);
-    // TODO: multi-dimension array initialization
-    assert(sizeVec.size() == 1);
+
+    if(sizeVec.size() != 1){
+        throw std::invalid_argument("sizeVec.size is not 1");
+    }
 
     for (int index = 0; index < this->expressionList->size(); index++)
     {

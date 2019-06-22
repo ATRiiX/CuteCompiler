@@ -56,7 +56,10 @@ TypeSystem::TypeSystem(LLVMContext &context) : llvmContext(context)
 
 Type *TypeSystem::getVarType(const NIdentifier &type)
 {
-    assert(type.isType);
+    if (type.isType == false)
+    {
+        throw std::invalid_argument("type.isType is false");
+    }
     if (type.isArray)
     {
         return PointerType::get(getVarType(type.name), 0);

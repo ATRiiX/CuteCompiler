@@ -14,7 +14,7 @@
 #include <string>
 #include <typeinfo>
 #include <regex>
-
+#include <assert.h>
 #include "json.hpp"
 using namespace std;
 using json = nlohmann::json;
@@ -408,8 +408,15 @@ public:
         : type(type), id(id), assignmentExpr(assignmentExpr)
     {
         className = __func__;
-        assert(type->isType);
-        assert(!type->isArray || (type->isArray && type->arraySize != nullptr));
+        if (type->isType == false)
+        {
+            throw std::invalid_argument("type.isType is false");
+        }
+
+        if (!(!type->isArray || (type->isArray && type->arraySize != nullptr)))
+        {
+            throw std::invalid_argument("!(!type->isArray || (type->isArray && type->arraySize != nullptr))");
+        }
     }
 
     string getClassName() const override
@@ -453,7 +460,10 @@ public:
         : type(type), id(id), arguments(arguments), block(block), isExternal(isExt)
     {
         className = __func__;
-        assert(type->isType);
+        if (type->isType == false)
+        {
+            throw std::invalid_argument("type.isType is false in NStatement NFunctionDeclaration");
+        }
     }
 
     string getClassName() const override
@@ -474,8 +484,11 @@ public:
         {
             children.push_back((*it)->AST_JSON_Generate());
         }
+        if (!((isExternal || block != nullptr)))
+        {
+            throw std::invalid_argument("!((isExternal || block != nullptr))");
+        }
 
-        assert(isExternal || block != nullptr);
         if (block)
         {
             children.push_back(block->AST_JSON_Generate());
@@ -486,8 +499,6 @@ public:
 
     virtual llvm::Value *codeGen(CodeGenContext &context) override;
 };
-
-
 
 class NReturnStatement : public NStatement
 {
@@ -613,8 +624,6 @@ public:
     llvm::Value *codeGen(CodeGenContext &context) override;
 };
 
-
-
 class NArrayIndex : public NExpression
 {
 public:
@@ -730,8 +739,6 @@ public:
 
     llvm::Value *codeGen(CodeGenContext &context) override;
 };
-
-
 
 class NLiteral : public NExpression
 {
