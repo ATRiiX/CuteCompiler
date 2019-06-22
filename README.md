@@ -19,7 +19,7 @@ g++ -c `llvm-config-3.9 --cppflags` -std=c++11 -o CodeGen.o CodeGen.cpp
 g++ -c `llvm-config-3.9 --cppflags` -std=c++11 -o main.o main.cpp          
 g++ -c `llvm-config-3.9 --cppflags` -std=c++11 -o ObjGen.o ObjGen.cpp          
 g++ -c `llvm-config-3.9 --cppflags` -std=c++11 -o TypeSystem.o TypeSystem.cpp          
-g++ `llvm-config-3.9 --cppflags` -std=c++11 -o compiler grammar.o token.o CodeGen.o main.o ObjGen.o TypeSystem.o  `llvm-config-3.9 --libs` `llvm-config-3.9 --ldflags` -lpthread -ldl -lz -lncurses -rdynamic -L/usr/local/lib -ljsoncpp          
+g++ `llvm-config-3.9 --cppflags` -std=c++11 -o compiler grammar.o token.o CodeGen.o main.o ObjGen.o TypeSystem.o  `llvm-config-3.9 --libs` `llvm-config-3.9 --ldflags` -lpthread -ldl -lz -lncurses -rdynamic -L/usr/local/lib         
 
 rm *.o compiler grammar.cpp token.cpp test 
 ```
