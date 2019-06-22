@@ -41,6 +41,8 @@ clang++  output.o -o test
 
 cat tests/error.myc | ./compiler  
 
+cat tests/error2.myc | ./compiler  
+
 cat tests/basic.myc | ./compiler          
 clang++  output.o -o test          
 ./test   
