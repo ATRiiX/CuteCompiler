@@ -334,7 +334,7 @@ public:
     void setllvmContext(LLVMContext *llvmContext)
     {
         NExpression::setllvmContext(llvmContext);
-      //   NExpression::llvmContext = llvmContext;
+        //   NExpression::llvmContext = llvmContext;
         //  this.llvmContext = llvmContext;
     }
     json AST_JSON_Generate() const override
@@ -487,48 +487,7 @@ public:
     virtual llvm::Value *codeGen(CodeGenContext &context) override;
 };
 
-class NStructDeclaration : public NStatement
-{
-public:
-    shared_ptr<NIdentifier> name;
-    shared_ptr<VariableList> members = make_shared<VariableList>();
 
-    NStructDeclaration() { className = __func__; }
-
-    NStructDeclaration(shared_ptr<NIdentifier> id, shared_ptr<VariableList> arguments)
-        : name(id), members(arguments)
-    {
-        className = __func__;
-    }
-
-    string getClassName() const override
-    {
-        return className;
-    }
-
-    json AST_JSON_Generate() const override
-    {
-        json j;
-        j["name"] = getClassName() + this->colon + this->name->name;
-        bool flag = false;
-        json children;
-        for (auto it = members->begin(); it != members->end(); it++)
-        {
-            if (flag == false)
-            {
-                flag = true;
-            }
-            children.push_back((*it)->AST_JSON_Generate());
-        }
-        if (flag == true)
-        {
-            j["children"] = children;
-        }
-        return j;
-    }
-
-    virtual llvm::Value *codeGen(CodeGenContext &context) override;
-};
 
 class NReturnStatement : public NStatement
 {
@@ -654,39 +613,7 @@ public:
     llvm::Value *codeGen(CodeGenContext &context) override;
 };
 
-class NStructMember : public NExpression
-{
-public:
-    shared_ptr<NIdentifier> id;
-    shared_ptr<NIdentifier> member;
 
-    NStructMember() { className = __func__; }
-
-    NStructMember(shared_ptr<NIdentifier> structName, shared_ptr<NIdentifier> member)
-        : id(structName), member(member)
-    {
-        className = __func__;
-    }
-
-    string getClassName() const override
-    {
-        return className;
-    }
-
-    json AST_JSON_Generate() const override
-    {
-        json j;
-        j["name"] = getClassName();
-        json children;
-
-        children.push_back(id->AST_JSON_Generate());
-        children.push_back(member->AST_JSON_Generate());
-        j["children"] = children;
-        return j;
-    }
-
-    llvm::Value *codeGen(CodeGenContext &context) override;
-};
 
 class NArrayIndex : public NExpression
 {
@@ -804,39 +731,7 @@ public:
     llvm::Value *codeGen(CodeGenContext &context) override;
 };
 
-class NStructAssignment : public NExpression
-{
-public:
-    shared_ptr<NStructMember> structMember;
-    shared_ptr<NExpression> expression;
 
-    NStructAssignment() { className = __func__; }
-
-    NStructAssignment(shared_ptr<NStructMember> member, shared_ptr<NExpression> exp)
-        : structMember(member), expression(exp)
-    {
-        className = __func__;
-    }
-
-    string getClassName() const override
-    {
-        return className;
-    }
-
-    json AST_JSON_Generate() const override
-    {
-        json j;
-        j["name"] = getClassName();
-        json children;
-
-        children.push_back(structMember->AST_JSON_Generate());
-        children.push_back(expression->AST_JSON_Generate());
-        j["children"] = children;
-        return j;
-    }
-
-    llvm::Value *codeGen(CodeGenContext &context) override;
-};
 
 class NLiteral : public NExpression
 {

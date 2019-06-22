@@ -24,7 +24,6 @@ static FILE* yyparse_file_ptr;
 "return"                 return TOKEN(TRETURN);
 "for"                    return TOKEN(TFOR);
 "while"                  return TOKEN(TWHILE);
-"struct"                 return TOKEN(TSTRUCT);
 "int"                   SAVE_TOKEN;   return TYINT;
 "double"                SAVE_TOKEN;  return TYDOUBLE;
 "char"                  SAVE_TOKEN;  return TYCHAR;
@@ -59,8 +58,6 @@ static FILE* yyparse_file_ptr;
 "|"                      return TOKEN(TOR);
 "^"                      return TOKEN(TXOR);
 "%"                      return TOKEN(TMOD);
-">>"                     return TOKEN(TSHIFTR);
-"<<"                     return TOKEN(TSHIFTL);
 ";"                      return TOKEN(TSEMICOLON);
 .						printf("Unknown token:%s\n", yytext); yyterminate();
 

@@ -4,34 +4,34 @@
 string TypeSystem::llvmTypeToStr(Type *value)
 {
 
-    Type::TypeID typeID;
-    if (value != nullptr)
-        typeID = value->getTypeID();
-    else
-        throw std::invalid_argument("Value is nullptr");
-    //   value->print()
-    switch (typeID)
+    if (value == nullptr)
     {
-    case Type::VoidTyID:
+        throw std::invalid_argument("Value is nullptr");
+    }
+
+    //   value->print()
+    //   cout << "typeID is     " << typeID << endl;
+
+    switch (value->getTypeID())
+    {
+    case 0: ///<  0: type with no size
         return "VoidTyID";
-    case Type::HalfTyID:
+    case 1: ///<  1: 16-bit floating point type
         return "HalfTyID";
-    case Type::DoubleTyID:
+    case 3: ///<  3: 64-bit floating point type
         return "DoubleTyID";
-    case Type::IntegerTyID:
+    case 11: ///< 11: Arbitrary bit width integers
         return "IntegerTyID";
-    case Type::FunctionTyID:
+    case 12: ///< 12: Functions
         return "FunctionTyID";
-    case Type::StructTyID:
-        return "StructTyID";
-    case Type::ArrayTyID:
+    case 14: ///< 14: Arrays
         return "ArrayTyID";
-    case Type::PointerTyID:
+    case 15: ///< 15: Pointers
         return "PointerTyID";
-    case Type::VectorTyID:
+    case 16: ///< 16: SIMD 'packed' format, or other vector type
         return "VectorTyID";
     default:
-        throw std::invalid_argument("Unknown error in func llvmTypeToStr");
+        throw std::invalid_argument("Unknown typeID in func llvmTypeToStr");
     }
 }
 
@@ -45,25 +45,13 @@ string TypeSystem::llvmTypeToStr(Value *value)
 
 TypeSystem::TypeSystem(LLVMContext &context) : llvmContext(context)
 {
+    // Cast operators ...
+    // NOTE: The order matters here because CastInst::isEliminableCastPair
+    // NOTE: (see Instructions.cpp) encodes a table based on this ordering.
     addCast(intTy, doubleTy, llvm::CastInst::SIToFP);
     addCast(boolTy, doubleTy, llvm::CastInst::SIToFP);
     addCast(doubleTy, intTy, llvm::CastInst::FPToSI);
     addCast(intTy, intTy, llvm::CastInst::SExt);
-}
-
-void TypeSystem::addStructMember(string structName, string memType, string memName)
-{
-    if (this->_structTypes.find(structName) == this->_structTypes.end())
-    {
-        throw std::logic_error("Unknown struct name");
-    }
-    this->_structMembers[structName].push_back(std::make_pair(memType, memName));
-}
-
-void TypeSystem::addStructType(string name, llvm::StructType *type)
-{
-    this->_structTypes[name] = type;
-    this->_structMembers[name] = std::vector<TypeNamePair>();
 }
 
 Type *TypeSystem::getVarType(const NIdentifier &type)
@@ -123,31 +111,6 @@ Value *TypeSystem::cast(Value *value, Type *type, BasicBlock *block)
     return CastInst::Create(_castTable[from][type], value, type, "cast", block);
 }
 
-bool TypeSystem::isStruct(string typeStr) const
-{
-    return this->_structTypes.find(typeStr) != this->_structTypes.end();
-}
-
-long TypeSystem::getStructMemberIndex(string structName, string memberName)
-{
-    if (this->_structTypes.find(structName) == this->_structTypes.end())
-    {
-        throw std::logic_error("Unknown struct name");
-        return 0;
-    }
-    auto &members = this->_structMembers[structName];
-    for (auto it = members.begin(); it != members.end(); it++)
-    {
-        if (it->second == memberName)
-        {
-            return std::distance(members.begin(), it);
-        }
-    }
-
-    throw std::logic_error("Unknown struct member");
-
-}
-
 Type *TypeSystem::getVarType(string typeStr)
 {
 
@@ -175,9 +138,6 @@ Type *TypeSystem::getVarType(string typeStr)
     {
         return this->stringTy;
     }
-
-    if (this->_structTypes.find(typeStr) != this->_structTypes.end())
-        return this->_structTypes[typeStr];
 
     return nullptr;
 }

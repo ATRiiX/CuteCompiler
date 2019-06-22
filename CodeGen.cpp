@@ -47,25 +47,25 @@ using legacy::PassManager;
 
 static Type *
 TypeOf(const NIdentifier &type, CodeGenContext &context)
-{ 
+{
     return context.typeSystem.getVarType(type);
 }
 
-static Value *CastToBoolean(CodeGenContext &context, Value *condValue)
+static Value *CastToBoolean(CodeGenContext &context, Value *temp_Value)
 {
 
-    if (ISTYPE(condValue, Type::IntegerTyID))
+    if (ISTYPE(temp_Value, Type::IntegerTyID))
     {
-        condValue = context.builder.CreateIntCast(condValue, Type::getInt1Ty(context.llvmContext), true);
-        return context.builder.CreateICmpNE(condValue, ConstantInt::get(Type::getInt1Ty(context.llvmContext), 0, true));
+        temp_Value = context.builder.CreateIntCast(temp_Value, Type::getInt1Ty(context.llvmContext), true);
+        return context.builder.CreateICmpNE(temp_Value, ConstantInt::get(Type::getInt1Ty(context.llvmContext), 0, true));
     }
-    else if (ISTYPE(condValue, Type::DoubleTyID))
+    else if (ISTYPE(temp_Value, Type::DoubleTyID))
     {
-        return context.builder.CreateFCmpONE(condValue, ConstantFP::get(context.llvmContext, APFloat(0.0)));
+        return context.builder.CreateFCmpONE(temp_Value, ConstantFP::get(context.llvmContext, APFloat(0.0)));
     }
     else
     {
-        return condValue;
+        return temp_Value;
     }
 }
 
@@ -90,8 +90,7 @@ static llvm::Value *calcArrayIndex(shared_ptr<NArrayIndex> index, CodeGenContext
 void CodeGenContext::generateCode(NBlock &root)
 {
     //this->llvmContext;
-  //  root.llvmContext=CodeGenContext::llvmContext;
-
+    //  root.llvmContext=CodeGenContext::llvmContext;
 
     using namespace llvm;
     cout << "Generating IR code" << endl;
@@ -153,10 +152,11 @@ llvm::Value *NAssignment::codeGen(CodeGenContext &context)
 
 llvm::Value *NBinaryOperator::codeGen(CodeGenContext &context)
 {
+
     cout << "Generating binary operator" << endl;
 
-    Value *L = this->lhs->codeGen(context);
-    Value *R = this->rhs->codeGen(context);
+    auto *L = this->lhs->codeGen(context);
+    auto *R = this->rhs->codeGen(context);
     bool fp = false;
 
     if ((L->getType()->getTypeID() == Type::DoubleTyID) ||
@@ -200,18 +200,10 @@ llvm::Value *NBinaryOperator::codeGen(CodeGenContext &context)
                   : context.builder.CreateAnd(L, R, "andtmp");
     case TOR:
         return fp ? throw std::logic_error("Double type has no OR operation")
-                  : context.builder.CreateOr(L, R, "ortmp");
+                  : context.builder.CreateOr(L, R, "or tmp");
     case TXOR:
         return fp ? throw std::logic_error("Double type has no XOR operation")
-                  : context.builder.CreateXor(L, R, "xortmp");
-    case TSHIFTL:
-        return fp ? throw std::logic_error("Double type has no LEFT SHIFT operation")
-
-                  : context.builder.CreateShl(L, R, "shltmp");
-    case TSHIFTR:
-        return fp ? throw std::logic_error("Double type has no RIGHT SHIFT operation")
-                  : context.builder.CreateAShr(L, R, "ashrtmp");
-
+                  : context.builder.CreateXor(L, R, "xor tmp");
     case TCLT:
         return fp ? context.builder.CreateFCmpULT(L, R, "cmpftmp")
                   : context.builder.CreateICmpULT(L, R, "cmptmp");
@@ -355,25 +347,7 @@ llvm::Value *NFunctionDeclaration::codeGen(CodeGenContext &context)
     return function;
 }
 
-llvm::Value *NStructDeclaration::codeGen(CodeGenContext &context)
-{
-    cout << "Generating struct declaration of " << this->name->name << endl;
 
-    std::vector<Type *> memberTypes;
-
-    auto structType = StructType::create(context.llvmContext, this->name->name);
-    context.typeSystem.addStructType(this->name->name, structType);
-
-    for (auto &member : *this->members)
-    {
-        context.typeSystem.addStructMember(this->name->name, member->type->name, member->id->name);
-        memberTypes.push_back(TypeOf(*member->type, context));
-    }
-
-    structType->setBody(memberTypes);
-
-    return nullptr;
-}
 
 llvm::Value *NMethodCall::codeGen(CodeGenContext &context)
 {
@@ -455,11 +429,11 @@ llvm::Value *NReturnStatement::codeGen(CodeGenContext &context)
 llvm::Value *NIfStatement::codeGen(CodeGenContext &context)
 {
     cout << "Generating if statement" << endl;
-    Value *condValue = this->condition->codeGen(context);
-    if (!condValue)
+    Value *temp_Value = this->condition->codeGen(context);
+    if (!temp_Value)
         return nullptr;
 
-    condValue = CastToBoolean(context, condValue);
+    temp_Value = CastToBoolean(context, temp_Value);
 
     Function *theFunction = context.builder.GetInsertBlock()->getParent(); // the function where if statement is in
 
@@ -469,11 +443,11 @@ llvm::Value *NIfStatement::codeGen(CodeGenContext &context)
 
     if (this->falseBlock)
     {
-        context.builder.CreateCondBr(condValue, thenBB, falseBB);
+        context.builder.CreateCondBr(temp_Value, thenBB, falseBB);
     }
     else
     {
-        context.builder.CreateCondBr(condValue, thenBB, mergeBB);
+        context.builder.CreateCondBr(temp_Value, thenBB, mergeBB);
     }
 
     context.builder.SetInsertPoint(thenBB);
@@ -523,14 +497,14 @@ llvm::Value *NForStatement::codeGen(CodeGenContext &context)
     if (this->initial)
         this->initial->codeGen(context);
 
-    Value *condValue = this->condition->codeGen(context);
-    if (!condValue)
+    Value *temp_Value = this->condition->codeGen(context);
+    if (!temp_Value)
         return nullptr;
 
-    condValue = CastToBoolean(context, condValue);
+    temp_Value = CastToBoolean(context, temp_Value);
 
     // fall to the block
-    context.builder.CreateCondBr(condValue, block, after);
+    context.builder.CreateCondBr(temp_Value, block, after);
 
     context.builder.SetInsertPoint(block);
 
@@ -547,9 +521,9 @@ llvm::Value *NForStatement::codeGen(CodeGenContext &context)
     }
 
     // execute the again or stop
-    condValue = this->condition->codeGen(context);
-    condValue = CastToBoolean(context, condValue);
-    context.builder.CreateCondBr(condValue, block, after);
+    temp_Value = this->condition->codeGen(context);
+    temp_Value = CastToBoolean(context, temp_Value);
+    context.builder.CreateCondBr(temp_Value, block, after);
 
     // insert the after block
     theFunction->getBasicBlockList().push_back(after);
@@ -558,57 +532,9 @@ llvm::Value *NForStatement::codeGen(CodeGenContext &context)
     return nullptr;
 }
 
-llvm::Value *NStructMember::codeGen(CodeGenContext &context)
-{
-    cout << "Generating struct member expression of " << this->id->name << "." << this->member->name << endl;
 
-    auto varPtr = context.getSymbolValue(this->id->name);
-    auto structPtr = context.builder.CreateLoad(varPtr, "structPtr");
-    structPtr->setAlignment(4);
 
-    if (!structPtr->getType()->isStructTy())
-    {
-        throw std::logic_error("The variable is not struct");
-    }
 
-    string structName = structPtr->getType()->getStructName().str();
-    long memberIndex = context.typeSystem.getStructMemberIndex(structName, this->member->name);
-
-    std::vector<Value *> indices;
-    indices.push_back(ConstantInt::get(context.typeSystem.intTy, 0, false));
-    indices.push_back(ConstantInt::get(context.typeSystem.intTy, (int64_t)memberIndex, false));
-    auto ptr = context.builder.CreateInBoundsGEP(varPtr, indices, "memberPtr");
-
-    return context.builder.CreateLoad(ptr);
-}
-
-llvm::Value *NStructAssignment::codeGen(CodeGenContext &context)
-{
-    cout << "Generating struct assignment of " << this->structMember->id->name << "."
-         << this->structMember->member->name << endl;
-    auto varPtr = context.getSymbolValue(this->structMember->id->name);
-    auto structPtr = context.builder.CreateLoad(varPtr, "structPtr");
-    //    auto underlyingStruct = context.builder.CreateLoad(load);
-    structPtr->setAlignment(4);
-
-    if (!structPtr->getType()->isStructTy())
-    {
-        throw std::logic_error("The variable is not struct");
-    }
-
-    string structName = structPtr->getType()->getStructName().str();
-    long memberIndex = context.typeSystem.getStructMemberIndex(structName, this->structMember->member->name);
-
-    std::vector<Value *> indices;
-    auto value = this->expression->codeGen(context);
-    //    auto index = ;
-    indices.push_back(ConstantInt::get(context.typeSystem.intTy, 0, false));
-    indices.push_back(ConstantInt::get(context.typeSystem.intTy, (int64_t)memberIndex, false));
-
-    auto ptr = context.builder.CreateInBoundsGEP(varPtr, indices, "structMemberPtr");
-
-    return context.builder.CreateStore(value, ptr);
-}
 
 llvm::Value *NArrayIndex::codeGen(CodeGenContext &context)
 {

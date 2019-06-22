@@ -25,16 +25,12 @@ private:
 
     LLVMContext &llvmContext;
 
-    std::map <string, std::vector<TypeNamePair>> _structMembers;
-
-    std::map<string, llvm::StructType *> _structTypes;
-
     std::map<Type *, std::map < Type * , CastInst::CastOps>> _castTable;
 
     void addCast(Type *from, Type *to, CastInst::CastOps op);
 
 public:
-    Type *floatTy = Type::getFloatTy(llvmContext);
+
     Type *intTy = Type::getInt64Ty(llvmContext);
     Type *charTy = Type::getInt8Ty(llvmContext);
     Type *doubleTy = Type::getDoubleTy(llvmContext);
@@ -46,11 +42,7 @@ public:
 
     TypeSystem(LLVMContext &context);
 
-    void addStructType(string structName, llvm::StructType *);
 
-    void addStructMember(string structName, string memType, string memName);
-
-    long getStructMemberIndex(string structName, string memberName);
 
     Type *getVarType(const NIdentifier &type);
 
@@ -60,7 +52,6 @@ public:
 
     Value *cast(Value *value, Type *type, BasicBlock *block);
 
-    bool isStruct(string typeStr) const;
 
     static string llvmTypeToStr(Value *value);
 

@@ -50,22 +50,199 @@
                     "name": "NIdentifier:int"
                 },
                 {
-                    "name": "NIdentifier:test"
+                    "name": "NIdentifier:func"
+                },
+                {
+                    "children": [
+                        {
+                            "name": "NIdentifier:int"
+                        },
+                        {
+                            "name": "NIdentifier:a"
+                        }
+                    ],
+                    "name": "NVariableDeclaration"
+                },
+                {
+                    "children": [
+                        {
+                            "name": "NIdentifier:int"
+                        },
+                        {
+                            "name": "NIdentifier:b"
+                        }
+                    ],
+                    "name": "NVariableDeclaration"
                 },
                 {
                     "children": [
                         {
                             "children": [
                                 {
+                                    "name": "NIdentifier:int"
+                                },
+                                {
+                                    "name": "NIdentifier:res"
+                                },
+                                {
+                                    "name": "NExpression:0"
+                                }
+                            ],
+                            "name": "NVariableDeclaration"
+                        },
+                        {
+                            "children": [
+                                {
                                     "children": [
                                         {
-                                            "name": "NExpression:5"
+                                            "name": "NIdentifier:a"
                                         },
                                         {
-                                            "name": "NExpression:3"
+                                            "name": "NExpression:1"
                                         }
                                     ],
-                                    "name": "NBinaryOperator:287"
+                                    "name": "NBinaryOperator:272"
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "children": [
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "name": "NIdentifier:res"
+                                                        },
+                                                        {
+                                                            "name": "NExpression:1"
+                                                        }
+                                                    ],
+                                                    "name": "NAssignment"
+                                                }
+                                            ],
+                                            "name": "NExpressionStatement"
+                                        }
+                                    ],
+                                    "name": "NBlock"
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "children": [
+                                                {
+                                                    "name": "NExpression:1"
+                                                },
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "NIdentifier:res"
+                                                                        },
+                                                                        {
+                                                                            "children": [
+                                                                                {
+                                                                                    "children": [
+                                                                                        {
+                                                                                            "name": "NIdentifier:func"
+                                                                                        },
+                                                                                        {
+                                                                                            "children": [
+                                                                                                {
+                                                                                                    "name": "NIdentifier:a"
+                                                                                                },
+                                                                                                {
+                                                                                                    "name": "NExpression:1"
+                                                                                                }
+                                                                                            ],
+                                                                                            "name": "NBinaryOperator:287"
+                                                                                        },
+                                                                                        {
+                                                                                            "name": "NIdentifier:b"
+                                                                                        }
+                                                                                    ],
+                                                                                    "name": "NMethodCall"
+                                                                                },
+                                                                                {
+                                                                                    "children": [
+                                                                                        {
+                                                                                            "name": "NIdentifier:func"
+                                                                                        },
+                                                                                        {
+                                                                                            "children": [
+                                                                                                {
+                                                                                                    "name": "NIdentifier:a"
+                                                                                                },
+                                                                                                {
+                                                                                                    "name": "NExpression:2"
+                                                                                                }
+                                                                                            ],
+                                                                                            "name": "NBinaryOperator:287"
+                                                                                        },
+                                                                                        {
+                                                                                            "name": "NIdentifier:b"
+                                                                                        }
+                                                                                    ],
+                                                                                    "name": "NMethodCall"
+                                                                                }
+                                                                            ],
+                                                                            "name": "NBinaryOperator:286"
+                                                                        }
+                                                                    ],
+                                                                    "name": "NAssignment"
+                                                                }
+                                                            ],
+                                                            "name": "NExpressionStatement"
+                                                        }
+                                                    ],
+                                                    "name": "NBlock"
+                                                },
+                                                {
+                                                    "children": [
+                                                        {
+                                                            "children": [
+                                                                {
+                                                                    "children": [
+                                                                        {
+                                                                            "name": "NIdentifier:res"
+                                                                        },
+                                                                        {
+                                                                            "children": [
+                                                                                {
+                                                                                    "name": "NIdentifier:func"
+                                                                                },
+                                                                                {
+                                                                                    "name": "NIdentifier:b"
+                                                                                },
+                                                                                {
+                                                                                    "name": "NIdentifier:a"
+                                                                                }
+                                                                            ],
+                                                                            "name": "NMethodCall"
+                                                                        }
+                                                                    ],
+                                                                    "name": "NAssignment"
+                                                                }
+                                                            ],
+                                                            "name": "NExpressionStatement"
+                                                        }
+                                                    ],
+                                                    "name": "NBlock"
+                                                }
+                                            ],
+                                            "name": "NIfStatement"
+                                        }
+                                    ],
+                                    "name": "NBlock"
+                                }
+                            ],
+                            "name": "NIfStatement"
+                        },
+                        {
+                            "children": [
+                                {
+                                    "name": "NIdentifier:res"
                                 }
                             ],
                             "name": "NReturnStatement"
@@ -87,6 +264,33 @@
                 {
                     "children": [
                         {
+                            "name": "NIdentifier:int"
+                        },
+                        {
+                            "name": "NIdentifier:argc"
+                        }
+                    ],
+                    "name": "NVariableDeclaration"
+                },
+                {
+                    "children": [
+                        {
+                            "children": [
+                                {
+                                    "name": "NExpression:1"
+                                }
+                            ],
+                            "name": "NIdentifier:string(Array)"
+                        },
+                        {
+                            "name": "NIdentifier:argv"
+                        }
+                    ],
+                    "name": "NVariableDeclaration"
+                },
+                {
+                    "children": [
+                        {
                             "children": [
                                 {
                                     "name": "NIdentifier:int"
@@ -100,71 +304,12 @@
                         {
                             "children": [
                                 {
-                                    "name": "NIdentifier:int"
-                                },
-                                {
-                                    "name": "NIdentifier:j"
-                                }
-                            ],
-                            "name": "NVariableDeclaration"
-                        },
-                        {
-                            "children": [
-                                {
-                                    "name": "NIdentifier:int"
-                                },
-                                {
-                                    "name": "NIdentifier:k"
-                                }
-                            ],
-                            "name": "NVariableDeclaration"
-                        },
-                        {
-                            "children": [
-                                {
                                     "children": [
                                         {
-                                            "name": "NExpression:1"
+                                            "name": "NIdentifier:argc"
                                         },
                                         {
-                                            "name": "NExpression:2"
-                                        }
-                                    ],
-                                    "name": "NBinaryOperator:272"
-                                },
-                                {
-                                    "children": [
-                                        {
-                                            "children": [
-                                                {
-                                                    "children": [
-                                                        {
-                                                            "name": "NIdentifier:i"
-                                                        },
-                                                        {
-                                                            "name": "NExpression:1"
-                                                        }
-                                                    ],
-                                                    "name": "NAssignment"
-                                                }
-                                            ],
-                                            "name": "NExpressionStatement"
-                                        }
-                                    ],
-                                    "name": "NBlock"
-                                }
-                            ],
-                            "name": "NIfStatement"
-                        },
-                        {
-                            "children": [
-                                {
-                                    "children": [
-                                        {
-                                            "name": "NIdentifier:j"
-                                        },
-                                        {
-                                            "name": "NExpression:2"
+                                            "name": "NExpression:10"
                                         }
                                     ],
                                     "name": "NAssignment"
@@ -176,79 +321,47 @@
                             "children": [
                                 {
                                     "children": [
-                                        {
-                                            "name": "NIdentifier:j"
-                                        },
-                                        {
-                                            "name": "NExpression:3"
-                                        }
-                                    ],
-                                    "name": "NAssignment"
-                                }
-                            ],
-                            "name": "NExpressionStatement"
-                        },
-                        {
-                            "children": [
-                                {
-                                    "children": [
-                                        {
-                                            "name": "NIdentifier:k"
-                                        },
-                                        {
-                                            "children": [
-                                                {
-                                                    "name": "NIdentifier:test"
-                                                }
-                                            ],
-                                            "name": "NMethodCall"
-                                        }
-                                    ],
-                                    "name": "NAssignment"
-                                }
-                            ],
-                            "name": "NExpressionStatement"
-                        },
-                        {
-                            "children": [
-                                {
-                                    "children": [
-                                        {
-                                            "name": "NIdentifier:printf"
-                                        },
-                                        {
-                                            "name": "NLiteral:i=%d,j=%d,k=%d"
-                                        },
                                         {
                                             "name": "NIdentifier:i"
                                         },
                                         {
-                                            "name": "NIdentifier:j"
-                                        },
-                                        {
-                                            "name": "NIdentifier:k"
+                                            "name": "NExpression:1"
                                         }
                                     ],
-                                    "name": "NMethodCall"
-                                }
-                            ],
-                            "name": "NExpressionStatement"
-                        },
-                        {
-                            "children": [
+                                    "name": "NAssignment"
+                                },
                                 {
                                     "children": [
                                         {
-                                            "name": "NIdentifier:puts"
+                                            "name": "NIdentifier:i"
                                         },
                                         {
-                                            "name": "NLiteral:"
+                                            "name": "NIdentifier:argc"
                                         }
                                     ],
-                                    "name": "NMethodCall"
+                                    "name": "NBinaryOperator:271"
+                                },
+                                {
+                                    "children": [
+                                        {
+                                            "name": "NIdentifier:i"
+                                        },
+                                        {
+                                            "children": [
+                                                {
+                                                    "name": "NIdentifier:i"
+                                                },
+                                                {
+                                                    "name": "NExpression:1"
+                                                }
+                                            ],
+                                            "name": "NBinaryOperator:286"
+                                        }
+                                    ],
+                                    "name": "NAssignment"
                                 }
                             ],
-                            "name": "NExpressionStatement"
+                            "name": "NForStatement"
                         },
                         {
                             "children": [
