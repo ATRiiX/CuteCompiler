@@ -39,7 +39,7 @@ cat tests/opt.myc | ./compiler
 clang++  output.o -o test          
 ./test   
 
-
+cat tests/error.myc | ./compiler  
 
 cat tests/basic.myc | ./compiler          
 clang++  output.o -o test          
