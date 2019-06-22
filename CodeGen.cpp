@@ -1,24 +1,12 @@
- #include "llvm/Analysis/AssumptionCache.h"
- #include "llvm/Analysis/InlineCost.h"
- #include "llvm/Analysis/ProfileSummaryInfo.h"
- #include "llvm/Analysis/TargetLibraryInfo.h"
- #include "llvm/Analysis/TargetTransformInfo.h"
- #include "llvm/IR/CallSite.h"
- #include "llvm/IR/CallingConv.h"
- #include "llvm/IR/DataLayout.h"
- #include "llvm/IR/Instructions.h"
- #include "llvm/IR/Module.h"
- #include "llvm/IR/Type.h"
- #include "llvm/Transforms/IPO.h"
-
-
-
-
-
-
-
-
-
+#include "CodeGen.h"
+#include "ASTNodes2.h"
+#include "llvm/IR/CallSite.h"
+#include "llvm/IR/CallingConv.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/Transforms/IPO.h"
 #include <llvm/IR/Value.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/IRBuilder.h>
@@ -31,6 +19,17 @@
 #include <llvm/Support/raw_ostream.h>
 #include "llvm/ADT/iterator_range.h"
 #include "llvm/ADT/STLExtras.h"
+#include "llvm/IR/DataLayout.h"
+#include "llvm/IR/Mangler.h"
+#include "llvm/Support/DynamicLibrary.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/Target/TargetMachine.h"
+#include "llvm/Analysis/AssumptionCache.h"
+#include "llvm/Analysis/InlineCost.h"
+#include "llvm/Analysis/ProfileSummaryInfo.h"
+#include "llvm/Analysis/TargetLibraryInfo.h"
+#include "llvm/Analysis/TargetTransformInfo.h"
+#include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/ExecutionEngine/ExecutionEngine.h"
 #include "llvm/ExecutionEngine/JITSymbolFlags.h"
 #include "llvm/ExecutionEngine/RTDyldMemoryManager.h"
@@ -41,37 +40,10 @@
 #include "llvm/ExecutionEngine/Orc/IRCompileLayer.h"
 #include "llvm/ExecutionEngine/Orc/LambdaResolver.h"
 #include "llvm/ExecutionEngine/Orc/ObjectLinkingLayer.h"
-#include "llvm/IR/DataLayout.h"
-#include "llvm/IR/Mangler.h"
-#include "llvm/Support/DynamicLibrary.h"
-#include "llvm/Support/raw_ostream.h"
-#include "llvm/Target/TargetMachine.h"
-
-
-
-#include "llvm/Transforms/IPO/PassManagerBuilder.h"
-
-
-
-
-//#include <llvm/IR/Verifier.h>
-#include "CodeGen.h"
-#include "ASTNodes2.h"
-
-
+#include <stdexcept>
 using legacy::PassManager;
 #define ISTYPE(value, id) (value->getType()->getTypeID() == id)
 
-/*
- * TODO:
- *       1. unary ops
- *       2. variable declaration list
- *
- *
- *
- */
-
-//
 static Type *
 TypeOf(const NIdentifier &type, CodeGenContext &context)
 { // get llvm::type of variable base on its identifier
@@ -109,7 +81,6 @@ static llvm::Value *calcArrayIndex(shared_ptr<NArrayIndex> index, CodeGenContext
                                                  index->expressions->at(i - 1));
 
         expression = make_shared<NBinaryOperator>(temp, TPLUS, expression);
-
     }
 
     return expression->codeGen(context);
@@ -131,27 +102,26 @@ void CodeGenContext::generateCode(NBlock &root)
 
     cout << "Code generate success" << endl;
     cout << "IR Code  is :" << endl;
-    
-  //  llvm::legacy::PassManager passManager;
-  //  passManager.add(createPrintModulePass(outs()));
-  //  passManager.run(*(this->theModule.get()));
+
+    //  llvm::legacy::PassManager passManager;
+    //  passManager.add(createPrintModulePass(outs()));
+    //  passManager.run(*(this->theModule.get()));
 
     llvm::legacy::PassManager *pm = new llvm::legacy::PassManager();
-    int optLevel = 3;//优化级别 0-3 3最高
-    int sizeLevel = 0;//大小优化 0是无 2最大
+    int optLevel = 3;  //优化级别 0-3 3最高
+    int sizeLevel = 0; //大小优化 0是无 2最大
     PassManagerBuilder builder;
     builder.OptLevel = optLevel;
     builder.SizeLevel = sizeLevel;
     builder.Inliner = createFunctionInliningPass(optLevel, sizeLevel);
     builder.DisableUnitAtATime = false;
-    builder.DisableUnrollLoops = false;//If True, disable loop unrolling.
-    builder.LoopVectorize = true;//allow vectorizing loops
-    builder.SLPVectorize = true;//If True, enable the SLP vectorizer, which uses a different algorithm than the loop vectorizer. Both may be enabled at the same time.
+    builder.DisableUnrollLoops = false; //If True, disable loop unrolling.
+    builder.LoopVectorize = true;       //allow vectorizing loops
+    builder.SLPVectorize = true;        //If True, enable the SLP vectorizer, which uses a different algorithm than the loop vectorizer. Both may be enabled at the same time.
     builder.populateModulePassManager(*pm);
-  //  builder.DisableTailCalls
+    //  builder.DisableTailCalls
     (*pm).add(createPrintModulePass(outs()));
     (*pm).run(*(this->theModule.get()));
-
 
     return;
 }
@@ -164,7 +134,7 @@ llvm::Value *NAssignment::codeGen(CodeGenContext &context)
     string dstTypeStr = dstType->name;
     if (!dst)
     {
-        return LogErrorV("Undeclared variable");
+        throw std::logic_error("Undeclared variable");
     }
     Value *exp = exp = this->rhs->codeGen(context);
 
@@ -209,38 +179,54 @@ llvm::Value *NBinaryOperator::codeGen(CodeGenContext &context)
     switch (this->op)
     {
     case TPLUS:
-        return fp ? context.builder.CreateFAdd(L, R, "addftmp") : context.builder.CreateAdd(L, R, "addtmp");
+        return fp ? context.builder.CreateFAdd(L, R, "addftmp")
+                  : context.builder.CreateAdd(L, R, "addtmp");
     case TMINUS:
-        return fp ? context.builder.CreateFSub(L, R, "subftmp") : context.builder.CreateSub(L, R, "subtmp");
+        return fp ? context.builder.CreateFSub(L, R, "subftmp")
+                  : context.builder.CreateSub(L, R, "subtmp");
     case TMUL:
-        return fp ? context.builder.CreateFMul(L, R, "mulftmp") : context.builder.CreateMul(L, R, "multmp");
+        return fp ? context.builder.CreateFMul(L, R, "mulftmp")
+                  : context.builder.CreateMul(L, R, "multmp");
     case TDIV:
-        return fp ? context.builder.CreateFDiv(L, R, "divftmp") : context.builder.CreateSDiv(L, R, "divtmp");
+        return fp ? context.builder.CreateFDiv(L, R, "divftmp")
+                  : context.builder.CreateSDiv(L, R, "divtmp");
     case TAND:
-        return fp ? LogErrorV("Double type has no AND operation") : context.builder.CreateAnd(L, R, "andtmp");
+        return fp ? throw std::logic_error("Double type has no AND operation")
+                  : context.builder.CreateAnd(L, R, "andtmp");
     case TOR:
-        return fp ? LogErrorV("Double type has no OR operation") : context.builder.CreateOr(L, R, "ortmp");
+        return fp ?throw std::logic_error("Double type has no OR operation")
+                  : context.builder.CreateOr(L, R, "ortmp");
     case TXOR:
-        return fp ? LogErrorV("Double type has no XOR operation") : context.builder.CreateXor(L, R, "xortmp");
+        return fp ? throw std::logic_error("Double type has no XOR operation")
+                  : context.builder.CreateXor(L, R, "xortmp");
     case TSHIFTL:
-        return fp ? LogErrorV("Double type has no LEFT SHIFT operation") : context.builder.CreateShl(L, R, "shltmp");
+        return fp ? throw std::logic_error("Double type has no LEFT SHIFT operation")
+
+                  : context.builder.CreateShl(L, R, "shltmp");
     case TSHIFTR:
-        return fp ? LogErrorV("Double type has no RIGHT SHIFT operation") : context.builder.CreateAShr(L, R, "ashrtmp");
+        return fp ? throw std::logic_error("Double type has no RIGHT SHIFT operation")
+                  : context.builder.CreateAShr(L, R, "ashrtmp");
 
     case TCLT:
-        return fp ? context.builder.CreateFCmpULT(L, R, "cmpftmp") : context.builder.CreateICmpULT(L, R, "cmptmp");
+        return fp ? context.builder.CreateFCmpULT(L, R, "cmpftmp")
+                  : context.builder.CreateICmpULT(L, R, "cmptmp");
     case TCLE:
-        return fp ? context.builder.CreateFCmpOLE(L, R, "cmpftmp") : context.builder.CreateICmpSLE(L, R, "cmptmp");
+        return fp ? context.builder.CreateFCmpOLE(L, R, "cmpftmp")
+                  : context.builder.CreateICmpSLE(L, R, "cmptmp");
     case TCGE:
-        return fp ? context.builder.CreateFCmpOGE(L, R, "cmpftmp") : context.builder.CreateICmpSGE(L, R, "cmptmp");
+        return fp ? context.builder.CreateFCmpOGE(L, R, "cmpftmp")
+                  : context.builder.CreateICmpSGE(L, R, "cmptmp");
     case TCGT:
-        return fp ? context.builder.CreateFCmpOGT(L, R, "cmpftmp") : context.builder.CreateICmpSGT(L, R, "cmptmp");
+        return fp ? context.builder.CreateFCmpOGT(L, R, "cmpftmp")
+                  : context.builder.CreateICmpSGT(L, R, "cmptmp");
     case TCEQ:
-        return fp ? context.builder.CreateFCmpOEQ(L, R, "cmpftmp") : context.builder.CreateICmpEQ(L, R, "cmptmp");
+        return fp ? context.builder.CreateFCmpOEQ(L, R, "cmpftmp")
+                  : context.builder.CreateICmpEQ(L, R, "cmptmp");
     case TCNE:
-        return fp ? context.builder.CreateFCmpONE(L, R, "cmpftmp") : context.builder.CreateICmpNE(L, R, "cmptmp");
+        return fp ? context.builder.CreateFCmpONE(L, R, "cmpftmp")
+                  : context.builder.CreateICmpNE(L, R, "cmptmp");
     default:
-        return LogErrorV("Unknown binary operator");
+        throw std::logic_error("Unknown binary operator");
     }
 }
 
@@ -259,14 +245,12 @@ llvm::Value *NInteger::codeGen(CodeGenContext &context)
 {
     cout << "Generating Integer: " << this->value << endl;
     return ConstantInt::get(Type::getInt32Ty(context.llvmContext), this->value, true);
-    //    return ConstantInt::get(context.llvmContext, APInt(INTBITS, this->value, true));
 }
 
 llvm::Value *NDouble::codeGen(CodeGenContext &context)
 {
     cout << "Generating Double: " << this->value << endl;
     return ConstantFP::get(Type::getDoubleTy(context.llvmContext), this->value);
-    //    return ConstantFP::get(context.llvmContext, APFloat(this->value));
 }
 
 llvm::Value *NIdentifier::codeGen(CodeGenContext &context)
@@ -275,7 +259,7 @@ llvm::Value *NIdentifier::codeGen(CodeGenContext &context)
     Value *value = context.getSymbolValue(this->name);
     if (!value)
     {
-        return LogErrorV("Unknown variable name " + this->name);
+         throw std::logic_error( "Unknown variable name " + this->name );
     }
     if (value->getType()->isPointerTy())
     {
@@ -358,7 +342,8 @@ llvm::Value *NFunctionDeclaration::codeGen(CodeGenContext &context)
         }
         else
         {
-            return LogErrorV("Function block return value not founded");
+             throw std::logic_error("Function block return value not founded" );
+       
         }
         context.popBlock();
     }
@@ -393,14 +378,15 @@ llvm::Value *NMethodCall::codeGen(CodeGenContext &context)
     Function *calleeF = context.theModule->getFunction(this->id->name);
     if (!calleeF)
     {
-        LogErrorV("Function name not found");
+        throw std::logic_error("Function name not found");
     }
+    /* 
     if (calleeF->arg_size() != this->arguments->size())
     {
-        LogErrorV(
-            "Function arguments size not match, calleeF=" + std::to_string(calleeF->size()) + ", this->arguments=" +
-            std::to_string(this->arguments->size()));
+        throw std::logic_error("Function arguments size not match, calleeF=" + std::to_string(calleeF->size()) + ", this->arguments=" +
+                                    std::to_string(this->arguments->size()));
     }
+    */
     std::vector<Value *> argsv;
     for (auto it = this->arguments->begin(); it != this->arguments->end(); it++)
     {
@@ -579,7 +565,7 @@ llvm::Value *NStructMember::codeGen(CodeGenContext &context)
 
     if (!structPtr->getType()->isStructTy())
     {
-        return LogErrorV("The variable is not struct");
+         throw std::logic_error( "The variable is not struct" );
     }
 
     string structName = structPtr->getType()->getStructName().str();
@@ -604,7 +590,7 @@ llvm::Value *NStructAssignment::codeGen(CodeGenContext &context)
 
     if (!structPtr->getType()->isStructTy())
     {
-        return LogErrorV("The variable is not struct");
+         throw std::logic_error("The variable is not struct" );
     }
 
     string structName = structPtr->getType()->getStructName().str();
@@ -645,7 +631,7 @@ llvm::Value *NArrayIndex::codeGen(CodeGenContext &context)
     }
     else
     {
-        return LogErrorV("The variable is not array");
+        throw std::logic_error("The variable is not array");
     }
     auto ptr = context.builder.CreateInBoundsGEP(varPtr, indices, "elementPtr");
 
@@ -659,7 +645,7 @@ llvm::Value *NArrayAssignment::codeGen(CodeGenContext &context)
 
     if (varPtr == nullptr)
     {
-        return LogErrorV("Unknown variable name");
+        throw std::logic_error("Unknown variable name");
     }
 
     auto arrayPtr = context.builder.CreateLoad(varPtr, "arrayPtr");
@@ -667,7 +653,7 @@ llvm::Value *NArrayAssignment::codeGen(CodeGenContext &context)
 
     if (!arrayPtr->getType()->isArrayTy() && !arrayPtr->getType()->isPointerTy())
     {
-        return LogErrorV("The variable is not array");
+        throw std::logic_error("The variable is not array");
     }
     //    std::vector<Value*> indices;
     auto index = calcArrayIndex(arrayIndex, context);
@@ -700,26 +686,4 @@ llvm::Value *NArrayInitialization::codeGen(CodeGenContext &context)
 llvm::Value *NLiteral::codeGen(CodeGenContext &context)
 {
     return context.builder.CreateGlobalString(this->value, "string");
-}
-
-/*
- * Global Functions
- *
- */
-
-std::unique_ptr<NExpression> LogError(const char *str)
-{
-    fprintf(stderr, "LogError: %s\n", str);
-    return nullptr;
-}
-
-Value *LogErrorV(string str)
-{
-    return LogErrorV(str.c_str());
-}
-
-Value *LogErrorV(const char *str)
-{
-    LogError(str);
-    return nullptr;
 }

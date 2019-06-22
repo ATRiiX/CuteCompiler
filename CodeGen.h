@@ -50,7 +50,6 @@ public:
 
     Value *getSymbolValue(string name) const {
         for (auto it = blockStack.rbegin(); it != blockStack.rend(); it++) {
-//            cout << "(*it)->locals[" << name << "] = " << (*it)->locals[name] << endl;
             if ((*it)->locals.find(name) != (*it)->locals.end()) {
                 return (*it)->locals[name];
             }
@@ -60,7 +59,6 @@ public:
 
     shared_ptr <NIdentifier> getSymbolType(string name) const {
         for (auto it = blockStack.rbegin(); it != blockStack.rend(); it++) {
-//            cout << "(*it)->locals[" << name << "] = " << (*it)->locals[name] << endl;
             if ((*it)->types.find(name) != (*it)->types.end()) {
                 return (*it)->types[name];
             }
@@ -146,8 +144,6 @@ public:
     void generateCode(NBlock &);
 };
 
-Value *LogErrorV(const char *str);
 
-Value *LogErrorV(string str);
 
 #endif

@@ -6,7 +6,7 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
-
+#include <stdexcept>
 #include <string>
 #include <map>
 #include <vector>
@@ -16,51 +16,7 @@
 using std::string;
 using namespace llvm;
 
-//
-//struct VarType {
-//    string name;
-//
-//    VarType(string name): name(name){}
-//
-//    virtual Value* getDefaultValue(LLVMContext & context) const;
-//
-//    virtual bool isArray() const{
-//        return false;
-//    }
-//
-//    virtual bool isStruct() const{
-//        return false;
-//    }
-//
-//};
-//
-//struct VarArrayType: VarType{
-//
-//    NExpression & size;
-//
-//    VarArrayType(string name, NExpression& size)
-//            :VarType(name), size(size){
-//
-//    }
-//
-//    Value *getDefaultValue(LLVMContext &context) const override;
-//
-//
-//    bool isArray() const override{
-//        return true;
-//    }
-//
-//};
-//
-//struct VarStructType: VarType{
-//    VarStructType(string name): VarType(name){}
-//
-//    Value *getDefaultValue(LLVMContext &context) const override ;
-//
-//    bool isStruct() const override{
-//        return true;
-//    }
-//};
+
 
 using TypeNamePair = std::pair<std::string, std::string>;
 
