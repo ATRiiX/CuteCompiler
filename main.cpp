@@ -7,7 +7,7 @@
 #include <iomanip>
 #include "ASTNodes2.h"
 #include "CodeGen.h"
-#include "ObjGen.h"
+#include "ObjGenerate.h"
 #include "json.hpp"
 
 extern shared_ptr<NBlock> mainBlock;
@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 
         context.generateCode(*mainBlock);
 
-        ObjGen(context);
+        ObjGenerate(context);
 
         string jsonFile = "AST.json";
         std::ofstream outFile(jsonFile);

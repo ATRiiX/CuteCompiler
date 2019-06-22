@@ -166,16 +166,8 @@ llvm::Value *NBinaryOperator::codeGen(CodeGenContext &context)
 
     if ((L->getType()->getTypeID() == Type::DoubleTyID) ||
         (R->getType()->getTypeID() == Type::DoubleTyID))
-    { // type upgrade
+    { // type upgrade cast
         fp = true;
-        if ((R->getType()->getTypeID() != Type::DoubleTyID))
-        {
-            R = context.builder.CreateUIToFP(R, Type::getDoubleTy(context.llvmContext), "ftmp");
-        }
-        if ((L->getType()->getTypeID() != Type::DoubleTyID))
-        {
-            L = context.builder.CreateUIToFP(L, Type::getDoubleTy(context.llvmContext), "ftmp");
-        }
     }
 
     if (!L || !R)
@@ -272,7 +264,7 @@ llvm::Value *NIdentifier::codeGen(CodeGenContext &context)
             //            arrayPtr->setAlignment(16);
             std::vector<Value *> indices;
             indices.push_back(ConstantInt::get(context.typeSystem.intTy, 0, false));
-            auto ptr = context.builder.CreateInBoundsGEP(value, indices, "arrayPtr");
+            auto ptr = context.builder.CreateInBoundsGEP(value, indices, "array Ptr");
             return ptr;
         }
     }

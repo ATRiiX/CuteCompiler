@@ -12,7 +12,7 @@
 #include <llvm/IR/LegacyPassManager.h>
 
 #include "CodeGen.h"
-#include "ObjGen.h"
+#include "ObjGenerate.h"
 
 #include <unistd.h>
 #include <stdio.h>
@@ -22,10 +22,10 @@
 using namespace std;
 using namespace llvm;
 
-void ObjGen(CodeGenContext &context)
+void ObjGenerate(CodeGenContext &context)
 {
     const string filename = "output.o";
-    ObjGen(context, filename);
+    ObjGenerate(context, filename);
 }
 /*
 rm test system_test
@@ -45,7 +45,7 @@ void system_call_clang(string inputfilename, string outputfilename)
     system(command.c_str());
     // system("clang++ -O3  output.o -o test ");
 }
-void ObjGen(CodeGenContext &context, string filename)
+void ObjGenerate(CodeGenContext &context, string filename)
 {
 
     outs() << "Object code start generate "

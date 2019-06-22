@@ -50,8 +50,6 @@ TypeSystem::TypeSystem(LLVMContext &context) : llvmContext(context)
     // NOTE: (see Instructions.cpp) encodes a table based on this ordering.
     addCast(intTy, doubleTy, llvm::CastInst::SIToFP);
     addCast(boolTy, doubleTy, llvm::CastInst::SIToFP);
-    addCast(doubleTy, intTy, llvm::CastInst::FPToSI);
-    addCast(intTy, intTy, llvm::CastInst::SExt);
 }
 
 Type *TypeSystem::getVarType(const NIdentifier &type)
@@ -101,46 +99,42 @@ Value *TypeSystem::cast(Value *value, Type *type, BasicBlock *block)
     if (_castTable.find(from) == _castTable.end())
     {
         throw std::logic_error("Type has no cast");
-        return value;
     }
     if (_castTable[from].find(type) == _castTable[from].end())
     {
         string error = "Unable to cast from ";
         error += llvmTypeToStr(from) + " to " + llvmTypeToStr(type);
         throw std::logic_error(error.c_str());
-        return value;
     }
 
     return CastInst::Create(_castTable[from][type], value, type, "cast", block);
+}
+constexpr unsigned int str2int(const char *str, int h = 0)
+{
+    return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
 }
 
 Type *TypeSystem::getVarType(string typeStr)
 {
 
-    if (typeStr.compare("int") == 0)
+    switch (str2int(typeStr.c_str()))
     {
+    case str2int("int"):
         return this->intTy;
-    }
-    if (typeStr.compare("double") == 0)
-    {
+    case str2int("double"):
         return this->doubleTy;
-    }
-    if (typeStr.compare("bool") == 0)
-    {
-        return this->boolTy;
-    }
-    if (typeStr.compare("char") == 0)
-    {
-        return this->charTy;
-    }
-    if (typeStr.compare("void") == 0)
-    {
-        return this->voidTy;
-    }
-    if (typeStr.compare("string") == 0)
-    {
-        return this->stringTy;
-    }
 
-    return nullptr;
+    case str2int("bool"):
+        return this->boolTy;
+
+    case str2int("char"):
+        return this->charTy;
+
+    case str2int("void"):
+        return this->voidTy;
+    case str2int("string"):
+        return this->stringTy;
+    default:
+        return nullptr;
+    }
 }
