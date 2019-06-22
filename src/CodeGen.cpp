@@ -56,12 +56,12 @@ static Value *CastBoolean(CodeGenContext &context, Value *temp_Value)
     auto id = temp_Value->getType()->getTypeID();
     switch (id)
     {
-    case (Type::IntegerTypeID):
+    case (Type::IntegerTyID):
     {
         temp_Value = context.builder.CreateIntCast(temp_Value, Type::getInt1Ty(context.llvmContext), true);
         return context.builder.CreateICmpNE(temp_Value, ConstantInt::get(Type::getInt1Ty(context.llvmContext), 0, true));
     }
-    case (Type::DoubleTypeID):
+    case (Type::DoubleTyID):
     {
         return context.builder.CreateFCmpONE(temp_Value, ConstantFP::get(context.llvmContext, APFloat(0.0)));
     }
@@ -157,8 +157,8 @@ llvm::Value *NBinaryOperator::codeGen(CodeGenContext &context)
     auto *R = this->rhs->codeGen(context);
     bool fp = false;
 
-    if ((L->getType()->getTypeID() == Type::DoubleTypeID) ||
-        (R->getType()->getTypeID() == Type::DoubleTypeID))
+    if ((L->getType()->getTypeID() == Type::DoubleTyID) ||
+        (R->getType()->getTypeID() == Type::DoubleTyID))
      // type upgrade cast
         fp = true;
 

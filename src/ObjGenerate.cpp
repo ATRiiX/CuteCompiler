@@ -27,12 +27,7 @@ void ObjGenerate(CodeGenContext &context)
     const string file = "output.o";
     ObjGenerate(context, file);
 }
-/*
-rm test system_test
-g++ -o system_test system_test.cpp
-./system_test
-./test
-*/
+
 void syscall(string inputfile, string outputfile)
 {
 
@@ -43,7 +38,6 @@ void syscall(string inputfile, string outputfile)
     string cmd = clang + tab + outputfile + tab + inputfile;
     cout << "run cmd:  " << cmd << endl;
     system(cmd.c_str());
-    // system("clang++ -O3  output.o -o test ");
 }
 void ObjGenerate(CodeGenContext &context, string file)
 {

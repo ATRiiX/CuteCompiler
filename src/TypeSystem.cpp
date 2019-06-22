@@ -15,21 +15,21 @@ string TypeSystem::llvmTypeToStr(Type *value)
     switch (value->getTypeID())
     {
     case 0: ///<  0: type with no size
-        return "VoidTypeID";
+        return "VoidTyID";
     case 1: ///<  1: 16-bit floating point type
-        return "HalfTypeID";
+        return "HalfTyID";
     case 3: ///<  3: 64-bit floating point type
-        return "DoubleTypeID";
+        return "DoubleTyID";
     case 11: ///< 11: Arbitrary bit width integers
-        return "IntegerTypeID";
+        return "IntegerTyID";
     case 12: ///< 12: Functions
-        return "FunctionTypeID";
+        return "FunctionTyID";
     case 14: ///< 14: Arrays
-        return "ArrayTypeID";
+        return "ArrayTyID";
     case 15: ///< 15: Pointers
-        return "PointerTypeID";
+        return "PointerTyID";
     case 16: ///< 16: SIMD 'packed' format, or other vector type
-        return "VectorTypeID";
+        return "VectorTyID";
     default:
         throw std::invalid_argument("Unknown typeID in func llvmTypeToStr");
     }
