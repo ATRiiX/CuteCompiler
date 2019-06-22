@@ -41,17 +41,19 @@ int main(int argc, char **argv)
     }
     catch (const std::logic_error &e)
     {
-         cout << "logic_error error catched!" << endl;
+        cout << "logic_error error catched!" << endl;
         std::cout << e.what() << std::endl;
         return 1;
     }
     catch (std::exception &e)
     {
-        cout << "unexpected error catched!" << endl;
+        cout << " other error catched!" << endl;
         std::cout << e.what() << std::endl;
         return -1;
-    }catch(...) { 
-        cout << "other error catched!"; 
-         return -2;
-    } 
+    }
+    catch (...)
+    {
+        cout << "unexpected error catched!";
+        return -2;
+    }
 }

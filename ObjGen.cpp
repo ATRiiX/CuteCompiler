@@ -58,7 +58,7 @@ void ObjGen(CodeGenContext &context, string filename)
     InitializeAllAsmPrinters();
 
     auto targetTriple = sys::getDefaultTargetTriple();
-    context.theModule->setTargetTriple(targetTriple);
+    context.myModule->setTargetTriple(targetTriple);
 
     std::string error;
     auto Target = TargetRegistry::lookupTarget(targetTriple, error);
@@ -76,8 +76,8 @@ void ObjGen(CodeGenContext &context, string filename)
     auto RM = Optional<Reloc::Model>();
     auto theTargetMachine = Target->createTargetMachine(targetTriple, CPU, features, opt, RM);
 
-    context.theModule->setDataLayout(theTargetMachine->createDataLayout());
-    context.theModule->setTargetTriple(targetTriple);
+    context.myModule->setDataLayout(theTargetMachine->createDataLayout());
+    context.myModule->setTargetTriple(targetTriple);
 
     std::error_code EC;
     raw_fd_ostream dest(filename.c_str(), EC, sys::fs::F_None);
@@ -93,7 +93,7 @@ void ObjGen(CodeGenContext &context, string filename)
         return;
     }
 
-    pass.run(*context.theModule.get());
+    pass.run(*context.myModule.get());
     dest.flush();
 
     outs() << "Object code wrote to " << filename.c_str() << "\n";

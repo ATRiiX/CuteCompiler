@@ -105,7 +105,7 @@ void CodeGenContext::generateCode(NBlock &root)
 
     //  llvm::legacy::PassManager passManager;
     //  passManager.add(createPrintModulePass(outs()));
-    //  passManager.run(*(this->theModule.get()));
+    //  passManager.run(*(this->myModule.get()));
 
     llvm::legacy::PassManager *pm = new llvm::legacy::PassManager();
     int optLevel = 3;  //优化级别 0-3 3最高
@@ -121,7 +121,7 @@ void CodeGenContext::generateCode(NBlock &root)
     builder.populateModulePassManager(*pm);
     //  builder.DisableTailCalls
     (*pm).add(createPrintModulePass(outs()));
-    (*pm).run(*(this->theModule.get()));
+    (*pm).run(*(this->myModule.get()));
 
     return;
 }
@@ -306,7 +306,7 @@ llvm::Value *NFunctionDeclaration::codeGen(CodeGenContext &context)
 
     FunctionType *functionType = FunctionType::get(retType, argTypes, false);
     Function *function = Function::Create(functionType, GlobalValue::ExternalLinkage, this->id->name.c_str(),
-                                          context.theModule.get());
+                                          context.myModule.get());
 
     if (!this->isExternal)
     {
@@ -375,18 +375,18 @@ llvm::Value *NStructDeclaration::codeGen(CodeGenContext &context)
 llvm::Value *NMethodCall::codeGen(CodeGenContext &context)
 {
     cout << "Generating method call of " << this->id->name << endl;
-    Function *calleeF = context.theModule->getFunction(this->id->name);
-    if (!calleeF)
+    Function *calleeF = context.myModule->getFunction(this->id->name);
+    if (calleeF==nullptr)
     {
         throw std::logic_error("Function name not found");
     }
-    /* 
-    if (calleeF->arg_size() != this->arguments->size())
+    
+    if (calleeF->arg_size() != this->arguments->size()&& this->id->name!="printf")
     {
         throw std::logic_error("Function arguments size not match, calleeF=" + std::to_string(calleeF->size()) + ", this->arguments=" +
                                     std::to_string(this->arguments->size()));
     }
-    */
+    
     std::vector<Value *> argsv;
     for (auto it = this->arguments->begin(); it != this->arguments->end(); it++)
     {

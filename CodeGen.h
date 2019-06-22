@@ -40,12 +40,12 @@ private:
 public:
     LLVMContext llvmContext;
     IRBuilder<> builder;
-    unique_ptr <Module> theModule;
+    unique_ptr <Module> myModule;
     SymTable globalVars;
     TypeSystem typeSystem;
 
     CodeGenContext() : builder(llvmContext), typeSystem(llvmContext) {
-        theModule = unique_ptr<Module>(new Module("main", this->llvmContext));
+        myModule = unique_ptr<Module>(new Module("main", this->llvmContext));
     }
 
     Value *getSymbolValue(string name) const {
