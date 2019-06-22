@@ -8,7 +8,7 @@
 #include "llvm/IR/Type.h"
 #include "llvm/Transforms/IPO.h"
 #include <llvm/IR/Value.h>
-#include <llvm/IR/LLVMContext.h>
+
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/LegacyPassManager.h>
@@ -41,12 +41,13 @@
 #include "llvm/ExecutionEngine/Orc/LambdaResolver.h"
 #include "llvm/ExecutionEngine/Orc/ObjectLinkingLayer.h"
 #include <stdexcept>
+#include <llvm/IR/LLVMContext.h>
 using legacy::PassManager;
 #define ISTYPE(value, id) (value->getType()->getTypeID() == id)
 
 static Type *
 TypeOf(const NIdentifier &type, CodeGenContext &context)
-{ // get llvm::type of variable base on its identifier
+{ 
     return context.typeSystem.getVarType(type);
 }
 
@@ -88,6 +89,10 @@ static llvm::Value *calcArrayIndex(shared_ptr<NArrayIndex> index, CodeGenContext
 
 void CodeGenContext::generateCode(NBlock &root)
 {
+    //this->llvmContext;
+  //  root.llvmContext=CodeGenContext::llvmContext;
+
+
     using namespace llvm;
     cout << "Generating IR code" << endl;
 
@@ -194,7 +199,7 @@ llvm::Value *NBinaryOperator::codeGen(CodeGenContext &context)
         return fp ? throw std::logic_error("Double type has no AND operation")
                   : context.builder.CreateAnd(L, R, "andtmp");
     case TOR:
-        return fp ?throw std::logic_error("Double type has no OR operation")
+        return fp ? throw std::logic_error("Double type has no OR operation")
                   : context.builder.CreateOr(L, R, "ortmp");
     case TXOR:
         return fp ? throw std::logic_error("Double type has no XOR operation")
@@ -244,7 +249,7 @@ llvm::Value *NBlock::codeGen(CodeGenContext &context)
 llvm::Value *NInteger::codeGen(CodeGenContext &context)
 {
     cout << "Generating Integer: " << this->value << endl;
-    return ConstantInt::get(Type::getInt32Ty(context.llvmContext), this->value, true);
+    return ConstantInt::get(Type::getInt64Ty(context.llvmContext), this->value, true);
 }
 
 llvm::Value *NDouble::codeGen(CodeGenContext &context)
@@ -259,7 +264,7 @@ llvm::Value *NIdentifier::codeGen(CodeGenContext &context)
     Value *value = context.getSymbolValue(this->name);
     if (!value)
     {
-         throw std::logic_error( "Unknown variable name " + this->name );
+        throw std::logic_error("Unknown variable name " + this->name);
     }
     if (value->getType()->isPointerTy())
     {
@@ -342,8 +347,7 @@ llvm::Value *NFunctionDeclaration::codeGen(CodeGenContext &context)
         }
         else
         {
-             throw std::logic_error("Function block return value not founded" );
-       
+            throw std::logic_error("Function block return value not founded");
         }
         context.popBlock();
     }
@@ -357,7 +361,6 @@ llvm::Value *NStructDeclaration::codeGen(CodeGenContext &context)
 
     std::vector<Type *> memberTypes;
 
-    //    context.builder.createstr
     auto structType = StructType::create(context.llvmContext, this->name->name);
     context.typeSystem.addStructType(this->name->name, structType);
 
@@ -376,17 +379,17 @@ llvm::Value *NMethodCall::codeGen(CodeGenContext &context)
 {
     cout << "Generating method call of " << this->id->name << endl;
     Function *calleeF = context.myModule->getFunction(this->id->name);
-    if (calleeF==nullptr)
+    if (calleeF == nullptr)
     {
         throw std::logic_error("Function name not found");
     }
-    
-    if (calleeF->arg_size() != this->arguments->size()&& this->id->name!="printf")
+
+    if (calleeF->arg_size() != this->arguments->size() && this->id->name != "printf")
     {
         throw std::logic_error("Function arguments size not match, calleeF=" + std::to_string(calleeF->size()) + ", this->arguments=" +
-                                    std::to_string(this->arguments->size()));
+                               std::to_string(this->arguments->size()));
     }
-    
+
     std::vector<Value *> argsv;
     for (auto it = this->arguments->begin(); it != this->arguments->end(); it++)
     {
@@ -409,8 +412,8 @@ llvm::Value *NVariableDeclaration::codeGen(CodeGenContext &context)
 
     if (this->type->isArray)
     {
-        uint64_t arraySize = 1;
-        std::vector<uint64_t> arraySizes;
+        int64_t arraySize = 1;
+        std::vector<int64_t> arraySizes;
         for (auto it = this->type->arraySize->begin(); it != this->type->arraySize->end(); it++)
         {
             NInteger *integer = dynamic_cast<NInteger *>(it->get());
@@ -565,7 +568,7 @@ llvm::Value *NStructMember::codeGen(CodeGenContext &context)
 
     if (!structPtr->getType()->isStructTy())
     {
-         throw std::logic_error( "The variable is not struct" );
+        throw std::logic_error("The variable is not struct");
     }
 
     string structName = structPtr->getType()->getStructName().str();
@@ -573,7 +576,7 @@ llvm::Value *NStructMember::codeGen(CodeGenContext &context)
 
     std::vector<Value *> indices;
     indices.push_back(ConstantInt::get(context.typeSystem.intTy, 0, false));
-    indices.push_back(ConstantInt::get(context.typeSystem.intTy, (uint64_t)memberIndex, false));
+    indices.push_back(ConstantInt::get(context.typeSystem.intTy, (int64_t)memberIndex, false));
     auto ptr = context.builder.CreateInBoundsGEP(varPtr, indices, "memberPtr");
 
     return context.builder.CreateLoad(ptr);
@@ -590,7 +593,7 @@ llvm::Value *NStructAssignment::codeGen(CodeGenContext &context)
 
     if (!structPtr->getType()->isStructTy())
     {
-         throw std::logic_error("The variable is not struct" );
+        throw std::logic_error("The variable is not struct");
     }
 
     string structName = structPtr->getType()->getStructName().str();
@@ -600,7 +603,7 @@ llvm::Value *NStructAssignment::codeGen(CodeGenContext &context)
     auto value = this->expression->codeGen(context);
     //    auto index = ;
     indices.push_back(ConstantInt::get(context.typeSystem.intTy, 0, false));
-    indices.push_back(ConstantInt::get(context.typeSystem.intTy, (uint64_t)memberIndex, false));
+    indices.push_back(ConstantInt::get(context.typeSystem.intTy, (int64_t)memberIndex, false));
 
     auto ptr = context.builder.CreateInBoundsGEP(varPtr, indices, "structMemberPtr");
 

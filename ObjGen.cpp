@@ -65,8 +65,7 @@ void ObjGen(CodeGenContext &context, string filename)
 
     if (!Target)
     {
-        errs() << error;
-        return;
+        throw std::invalid_argument(error);
     }
 
     auto CPU = "generic";
@@ -81,16 +80,13 @@ void ObjGen(CodeGenContext &context, string filename)
 
     std::error_code EC;
     raw_fd_ostream dest(filename.c_str(), EC, sys::fs::F_None);
-    //    raw_fd_ostream dest(filename.c_str(), EC, sys::fs::F_None);
-    //    formatted_raw_ostream formattedRawOstream(dest);
 
     legacy::PassManager pass;
     auto fileType = TargetMachine::CGFT_ObjectFile;
 
     if (theTargetMachine->addPassesToEmitFile(pass, dest, fileType))
     {
-        errs() << "theTargetMachine can't emit a file of this type";
-        return;
+        throw std::invalid_argument("theTargetMachine can't emit a file of this type");
     }
 
     pass.run(*context.myModule.get());

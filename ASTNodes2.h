@@ -1,7 +1,10 @@
 
 #ifndef __ASTNODES2_H__
 #define __ASTNODES2_H__
-
+#include <llvm/IR/Value.h>
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Module.h>
 #include <llvm/IR/Value.h>
 #include <json/json.h>
 #include <iostream>
@@ -13,17 +16,9 @@
 #include <regex>
 
 #include "json.hpp"
-//puts("$1"); return $1;
 using namespace std;
 using json = nlohmann::json;
-
-/*
-using std::cout;
-using std::endl;
-using std::string;
-using std::shared_ptr;
-using std::make_shared;
-*/
+using namespace llvm;
 class CodeGenContext;
 
 class NBlock;
@@ -38,20 +33,22 @@ typedef std::vector<shared_ptr<NStatement>> StatementList;
 typedef std::vector<shared_ptr<NExpression>> ExpressionList;
 typedef std::vector<shared_ptr<NVariableDeclaration>> VariableList;
 
-
-
 class Node
 {
 protected:
-    const char m_DELIM = ':';
+    const char colon = ':';
     string className;
 
 public:
+    static LLVMContext *llvmContext;
     Node() { className = __func__; }
 
     virtual ~Node() {}
 
     virtual string getClassName() const { return className; };
+
+    //virtual LLVMContext getllvmContext( ) { return llvmContext; }
+    //   virtual void setllvmContext(LLVMContext *llvmContext){ this.llvmContext = llvmContext; }
 
     virtual llvm::Value *codeGen(CodeGenContext &context) { return (llvm::Value *)0; }
 
@@ -62,7 +59,11 @@ class NExpression : public Node
 {
 public:
     NExpression() { className = __func__; }
-
+    void setllvmContext(LLVMContext *llvmContext)
+    {
+        Node::llvmContext = llvmContext;
+        //  this.llvmContext = llvmContext;
+    }
     string getClassName() const override
     {
         return className;
@@ -105,7 +106,6 @@ public:
     NDouble(double value)
         : value(value)
     {
-        // return "NDoub le=" << value << endl;
     }
 
     string getClassName() const override
@@ -116,7 +116,7 @@ public:
     json AST_JSON_Generate() const override
     {
         json j;
-        j["name"] = getClassName() + this->m_DELIM + std::to_string(value);
+        j["name"] = getClassName() + this->colon + std::to_string(value);
         return j;
     }
 
@@ -126,11 +126,11 @@ public:
 class NInteger : public NExpression
 {
 public:
-    uint64_t value;
+    int64_t value;
 
     NInteger() { className = __func__; }
 
-    NInteger(uint64_t value)
+    NInteger(int64_t value)
         : value(value)
     {
     }
@@ -143,7 +143,7 @@ public:
     json AST_JSON_Generate() const override
     {
         json j;
-        j["name"] = getClassName() + this->m_DELIM + std::to_string(value);
+        j["name"] = getClassName() + this->colon + std::to_string(value);
         return j;
     }
 
@@ -181,7 +181,7 @@ public:
     json AST_JSON_Generate() const override
     {
         json j;
-        j["name"] = getClassName() + this->m_DELIM + name + (isArray ? "(Array)" : "");
+        j["name"] = getClassName() + this->colon + name + (isArray ? "(Array)" : "");
         bool flag = false;
         json children;
         for (auto it = arraySize->begin(); it != arraySize->end(); it++)
@@ -271,7 +271,7 @@ public:
     json AST_JSON_Generate() const override
     {
         json j;
-        j["name"] = getClassName() + this->m_DELIM + std::to_string(op);
+        j["name"] = getClassName() + this->colon + std::to_string(op);
         json children;
 
         children.push_back(lhs->AST_JSON_Generate());
@@ -331,7 +331,12 @@ public:
     {
         return className;
     }
-
+    void setllvmContext(LLVMContext *llvmContext)
+    {
+        NExpression::setllvmContext(llvmContext);
+      //   NExpression::llvmContext = llvmContext;
+        //  this.llvmContext = llvmContext;
+    }
     json AST_JSON_Generate() const override
     {
 
@@ -403,7 +408,6 @@ public:
         : type(type), id(id), assignmentExpr(assignmentExpr)
     {
         className = __func__;
-        //    cout << "isArray = " << type->isArray << endl;
         assert(type->isType);
         assert(!type->isArray || (type->isArray && type->arraySize != nullptr));
     }
@@ -505,7 +509,7 @@ public:
     json AST_JSON_Generate() const override
     {
         json j;
-        j["name"] = getClassName() + this->m_DELIM + this->name->name;
+        j["name"] = getClassName() + this->colon + this->name->name;
         bool flag = false;
         json children;
         for (auto it = members->begin(); it != members->end(); it++)
@@ -855,7 +859,7 @@ public:
     json AST_JSON_Generate() const override
     {
         json j;
-        j["name"] = getClassName() + this->m_DELIM + value;
+        j["name"] = getClassName() + this->colon + value;
 
         return j;
     }

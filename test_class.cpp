@@ -6,7 +6,7 @@ using namespace std;
 
 class Node {
 private:
-    const char m_DELIM = ':';
+    const char colon = ':';
     const char *m_PREFIX = "--";
     string name;
     //   bool flag= false;

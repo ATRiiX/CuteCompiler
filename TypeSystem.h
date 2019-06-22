@@ -1,5 +1,5 @@
-#ifndef CUTECOMPLIER_TYPESYSTEM_H
-#define CUTECOMPLIER_TYPESYSTEM_H
+#ifndef TYPESYSTEM_H
+#define TYPESYSTEM_H
 
 #include <llvm/IR/Type.h>
 #include <llvm/IR/Value.h>
@@ -35,12 +35,13 @@ private:
 
 public:
     Type *floatTy = Type::getFloatTy(llvmContext);
-    Type *intTy = Type::getInt32Ty(llvmContext);
+    Type *intTy = Type::getInt64Ty(llvmContext);
     Type *charTy = Type::getInt8Ty(llvmContext);
     Type *doubleTy = Type::getDoubleTy(llvmContext);
     Type *stringTy = Type::getInt8PtrTy(llvmContext);
     Type *voidTy = Type::getVoidTy(llvmContext);
     Type *boolTy = Type::getInt1Ty(llvmContext);
+
 
 
     TypeSystem(LLVMContext &context);
@@ -67,4 +68,4 @@ public:
 };
 
 
-#endif //CUTECOMPLIER_TYPESYSTEM_H
+#endif 

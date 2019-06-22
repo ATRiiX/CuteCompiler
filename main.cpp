@@ -10,7 +10,7 @@
 #include "ObjGen.h"
 #include "json.hpp"
 
-extern shared_ptr<NBlock> programBlock;
+extern shared_ptr<NBlock> mainBlock;
 
 extern int yyparse();
 
@@ -24,11 +24,15 @@ int main(int argc, char **argv)
         yyparse();
 
         cout << "AST JSON Generate start!!" << endl;
-        json j = programBlock->AST_JSON_Generate();
+        json j = mainBlock->AST_JSON_Generate();
         std::cout << j.dump(4) << std::endl;
 
         CodeGenContext context;
-        context.generateCode(*programBlock);
+
+  //       (*mainBlock).setllvmContext(&context.llvmContext);
+     //   (*mainBlock).llvmContext=&context.llvmContext;
+
+        context.generateCode(*mainBlock);
 
         ObjGen(context);
 
