@@ -27,7 +27,6 @@ static FILE* yyparse_file_ptr;
 "struct"                 return TOKEN(TSTRUCT);
 "int"                   SAVE_TOKEN;   return TYINT;
 "double"                SAVE_TOKEN;  return TYDOUBLE;
-"float"                 SAVE_TOKEN;  return TYFLOAT;
 "char"                  SAVE_TOKEN;  return TYCHAR;
 "bool"                  SAVE_TOKEN;  return TYBOOL;
 "string"                SAVE_TOKEN; return TYSTRING;

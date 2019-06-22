@@ -16,8 +16,6 @@ string TypeSystem::llvmTypeToStr(Type *value)
         return "VoidTyID";
     case Type::HalfTyID:
         return "HalfTyID";
-    case Type::FloatTyID:
-        return "FloatTyID";
     case Type::DoubleTyID:
         return "DoubleTyID";
     case Type::IntegerTyID:
@@ -47,11 +45,8 @@ string TypeSystem::llvmTypeToStr(Value *value)
 
 TypeSystem::TypeSystem(LLVMContext &context) : llvmContext(context)
 {
-    addCast(intTy, floatTy, llvm::CastInst::SIToFP);
     addCast(intTy, doubleTy, llvm::CastInst::SIToFP);
     addCast(boolTy, doubleTy, llvm::CastInst::SIToFP);
-    addCast(floatTy, doubleTy, llvm::CastInst::FPExt);
-    addCast(floatTy, intTy, llvm::CastInst::FPToSI);
     addCast(doubleTy, intTy, llvm::CastInst::FPToSI);
     addCast(intTy, intTy, llvm::CastInst::SExt);
 }
@@ -91,7 +86,7 @@ Value *TypeSystem::getDefaultValue(string typeStr, LLVMContext &context)
     {
         return ConstantInt::get(type, 0, true);
     }
-    else if (type == this->doubleTy || type == this->floatTy)
+    else if (type == this->doubleTy || type == this->doubleTy)
     {
         return ConstantFP::get(type, 0);
     }
@@ -159,10 +154,6 @@ Type *TypeSystem::getVarType(string typeStr)
     if (typeStr.compare("int") == 0)
     {
         return this->intTy;
-    }
-    if (typeStr.compare("float") == 0)
-    {
-        return this->floatTy;
     }
     if (typeStr.compare("double") == 0)
     {
