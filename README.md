@@ -35,29 +35,24 @@ Fibonacci.myc是斐波那契递归调用的样例，
 
 
 ```js 
-cat tests/opt.myc | ./compiler          
-clang++  output.o -o test          
+cat tests/opt.myc | ./compiler              
 ./test   
 
 cat tests/error.myc | ./compiler  
 
 cat tests/error2.myc | ./compiler  
 
-cat tests/basic.myc | ./compiler          
-clang++  output.o -o test          
+cat tests/basic.myc | ./compiler               
 ./test   
 
-cat tests/sort.myc | ./compiler          
-clang++  output.o -o test          
+cat tests/sort.myc | ./compiler                  
 ./test     
 
-cat tests/Fibonacci.myc | ./compiler          
-clang++  output.o -o test          
+cat tests/Fibonacci.myc | ./compiler              
 ./test       
 
         
-cat tests/inputtest.myc | ./compiler          
-clang++  output.o -o test          
+cat tests/inputtest.myc | ./compiler                
 ./test          
 
 cat tests/error.myc | ./compiler          
