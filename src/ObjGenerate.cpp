@@ -79,9 +79,7 @@ void ObjGenerate(CodeGenContext &context, string file)
     auto fileType = TargetMachine::CGFT_ObjectFile;
 
     if (theTargetMachine->addPassesToEmitFile(pass, dest, fileType))
-    {
         throw std::invalid_argument("theTargetMachine can't emit a file of this type");
-    }
 
     pass.run(*context.myModule.get());
     dest.flush();

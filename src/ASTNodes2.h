@@ -105,8 +105,7 @@ public:
 
     NDouble(double value)
         : value(value)
-    {
-    }
+    {    }
 
     string getClassName() const override
     {
@@ -187,15 +186,11 @@ public:
         for (auto it = arraySize->begin(); it != arraySize->end(); it++)
         {
             if (flag == false)
-            {
                 flag = true;
-            }
             children.push_back((*it)->AST_JSON_Generate());
         }
         if (flag == true)
-        {
             j["children"] = children;
-        }
         return j;
     }
 
@@ -238,9 +233,7 @@ public:
 
         children.push_back(this->id->AST_JSON_Generate());
         for (auto it = arguments->begin(); it != arguments->end(); it++)
-        {
             children.push_back((*it)->AST_JSON_Generate());
-        }
         j["children"] = children;
         return j;
     }
@@ -347,15 +340,11 @@ public:
         for (auto it = statements->begin(); it != statements->end(); it++)
         {
             if (flag == false)
-            {
                 flag = true;
-            }
             children.push_back((*it)->AST_JSON_Generate());
         }
         if (flag == true)
-        {
             j["children"] = children;
-        }
         return j;
     }
 
@@ -409,14 +398,9 @@ public:
     {
         className = __func__;
         if (type->isType == false)
-        {
             throw std::invalid_argument("type.isType is false");
-        }
-
         if (!(!type->isArray || (type->isArray && type->arraySize != nullptr)))
-        {
             throw std::invalid_argument("!(!type->isArray || (type->isArray && type->arraySize != nullptr))");
-        }
     }
 
     string getClassName() const override
@@ -433,9 +417,7 @@ public:
         children.push_back(type->AST_JSON_Generate());
         children.push_back(id->AST_JSON_Generate());
         if (assignmentExpr != nullptr)
-        {
             children.push_back(assignmentExpr->AST_JSON_Generate());
-        }
         j["children"] = children;
         return j;
     }
@@ -461,9 +443,7 @@ public:
     {
         className = __func__;
         if (type->isType == false)
-        {
             throw std::invalid_argument("type.isType is false in NStatement NFunctionDeclaration");
-        }
     }
 
     string getClassName() const override
@@ -481,18 +461,12 @@ public:
         children.push_back(id->AST_JSON_Generate());
 
         for (auto it = arguments->begin(); it != arguments->end(); it++)
-        {
             children.push_back((*it)->AST_JSON_Generate());
-        }
         if (!((isExternal || block != nullptr)))
-        {
             throw std::invalid_argument("!((isExternal || block != nullptr))");
-        }
 
         if (block)
-        {
             children.push_back(block->AST_JSON_Generate());
-        }
         j["children"] = children;
         return j;
     }
@@ -561,9 +535,7 @@ public:
         children.push_back(condition->AST_JSON_Generate());
         children.push_back(trueBlock->AST_JSON_Generate());
         if (falseBlock)
-        {
             children.push_back(falseBlock->AST_JSON_Generate());
-        }
         j["children"] = children;
         return j;
     }
@@ -586,9 +558,7 @@ public:
     {
         className = __func__;
         if (condition == nullptr)
-        {
             condition = make_shared<NInteger>(1);
-        }
     }
 
     string getClassName() const override

@@ -262,19 +262,15 @@ llvm::Value *NExpressionStatement::codeGen(CodeGenContext &context)
 
 llvm::Value *NFunctionDeclaration::codeGen(CodeGenContext &context)
 {
-    cout << "Generating function declaration of " << this->id->name << endl;
+    cout << "Generating function declaration of :" << this->id->name << endl;
     std::vector<Type *> argTypes;
-
     for (auto &arg : *this->arguments)
     {
         if (arg->type->isArray)
-        {
             argTypes.push_back(PointerType::get(context.typeSystem.getVar(arg->type->name), 0));
-        }
+
         else
-        {
             argTypes.push_back(TypeOf(*arg->type, context));
-        }
     }
     Type *retType = nullptr;
     if (this->type->isArray)
@@ -315,13 +311,9 @@ llvm::Value *NFunctionDeclaration::codeGen(CodeGenContext &context)
 
         this->block->codeGen(context);
         if (context.getCurrentReturnValue())
-        {
             context.builder.CreateRet(context.getCurrentReturnValue());
-        }
         else
-        {
             throw std::logic_error("Function block return value not founded");
-        }
         context.popBlock();
     }
 
@@ -333,15 +325,11 @@ llvm::Value *NMethodCall::codeGen(CodeGenContext &context)
     cout << "Generating method call of " << this->id->name << endl;
     Function *calleeF = context.myModule->getFunction(this->id->name);
     if (calleeF == nullptr)
-    {
         throw std::logic_error("Function name not found");
-    }
 
     if (calleeF->arg_size() != this->arguments->size() && this->id->name != "printf")
-    {
         throw std::logic_error("Function arguments size not match, calleeF=" + std::to_string(calleeF->size()) + ", this->arguments=" +
                                std::to_string(this->arguments->size()));
-    }
 
     std::vector<Value *> argsv;
     for (auto it = this->arguments->begin(); it != this->arguments->end(); it++)
@@ -380,9 +368,7 @@ llvm::Value *NVariableDeclaration::codeGen(CodeGenContext &context)
         inst = context.builder.CreateAlloca(arrayType, arraySizeValue, "arraytmp");
     }
     else
-    {
         inst = context.builder.CreateAlloca(type);
-    }
 
     context.setSymbolType(this->id->name, this->type);
     context.setSymbolValue(this->id->name, inst);
@@ -421,13 +407,9 @@ llvm::Value *NIfStatement::codeGen(CodeGenContext &context)
     BasicBlock *mergeBB = BasicBlock::Create(context.llvmContext, "ifcont");
 
     if (this->falseBlock)
-    {
         context.builder.CreateCondBr(temp_Value, thenBB, falseBB);
-    }
     else
-    {
         context.builder.CreateCondBr(temp_Value, thenBB, mergeBB);
-    }
 
     context.builder.SetInsertPoint(thenBB);
 
@@ -440,9 +422,7 @@ llvm::Value *NIfStatement::codeGen(CodeGenContext &context)
     thenBB = context.builder.GetInsertBlock();
 
     if (thenBB->getTerminator() == nullptr)
-    {
         context.builder.CreateBr(mergeBB);
-    }
 
     if (this->falseBlock)
     {
@@ -493,9 +473,7 @@ llvm::Value *NForStatement::codeGen(CodeGenContext &context)
     context.popBlock();
 
     if (this->increment)
-    {
         this->increment->codeGen(context);
-    }
 
     temp_Value = this->condition->codeGen(context);
     temp_Value = CastBoolean(context, temp_Value);
@@ -515,9 +493,7 @@ llvm::Value *NArrayIndex::codeGen(CodeGenContext &context)
     string typeStr = type->name;
 
     if (type->isArray == false)
-    {
         throw std::invalid_argument("type.isArray is false");
-    }
 
     auto value = calcIndex(make_shared<NArrayIndex>(*this), context);
     ArrayRef<Value *> indices;
@@ -533,9 +509,7 @@ llvm::Value *NArrayIndex::codeGen(CodeGenContext &context)
         indices = {ConstantInt::get(Type::getInt64Ty(context.llvmContext), 0), value};
     }
     else
-    {
         throw std::logic_error("The variable is not array");
-    }
     auto ptr = context.builder.CreateInBoundsGEP(varPtr, indices, "elementPtr");
 
     return context.builder.CreateAlignedLoad(ptr, 4);
@@ -546,17 +520,12 @@ llvm::Value *NArrayAssignment::codeGen(CodeGenContext &context)
     auto varPtr = context.getSymbolValue(this->arrayIndex->arrayName->name);
 
     if (varPtr == nullptr)
-    {
         throw std::logic_error("Unknown variable name");
-    }
 
     auto arrayPtr = context.builder.CreateLoad(varPtr, "arrayPtr");
 
     if (!arrayPtr->getType()->isArrayTy() && !arrayPtr->getType()->isPointerTy())
-    {
         throw std::logic_error("The variable is not array");
-    }
-
     auto index = calcIndex(arrayIndex, context);
     ArrayRef<Value *> gep2_array{ConstantInt::get(Type::getInt64Ty(context.llvmContext), 0), index};
     auto ptr = context.builder.CreateInBoundsGEP(varPtr, gep2_array, "elementPtr");
@@ -571,9 +540,7 @@ llvm::Value *NArrayInitialization::codeGen(CodeGenContext &context)
     auto sizeVec = context.getArraySize(this->declaration->id->name);
 
     if (sizeVec.size() != 1)
-    {
         throw std::invalid_argument("sizeVec.size is not 1");
-    }
 
     for (int index = 0; index < this->expressionList->size(); index++)
     {

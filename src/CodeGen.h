@@ -49,11 +49,9 @@ public:
     }
 
     Value *getSymbolValue(string name) const {
-        for (auto it = blockStack.rbegin(); it != blockStack.rend(); it++) {
-            if ((*it)->locals.find(name) != (*it)->locals.end()) {
+        for (auto it = blockStack.rbegin(); it != blockStack.rend(); it++) 
+            if ((*it)->locals.find(name) != (*it)->locals.end()) 
                 return (*it)->locals[name];
-            }
-        }
         return nullptr;
     }
 
@@ -67,11 +65,9 @@ public:
     }
 
     bool isFuncArg(string name) const {
-        for (auto it = blockStack.rbegin(); it != blockStack.rend(); it++) {
-            if ((*it)->isFuncArg.find(name) != (*it)->isFuncArg.end()) {
+        for (auto it = blockStack.rbegin(); it != blockStack.rend(); it++) 
+            if ((*it)->isFuncArg.find(name) != (*it)->isFuncArg.end()) 
                 return (*it)->isFuncArg[name];
-            }
-        }
         return false;
     }
 
@@ -119,11 +115,9 @@ public:
     }
 
     std::vector <int64_t> getArraySize(string name) {
-        for (auto it = blockStack.rbegin(); it != blockStack.rend(); it++) {
-            if ((*it)->arraySizes.find(name) != (*it)->arraySizes.end()) {
+        for (auto it = blockStack.rbegin(); it != blockStack.rend(); it++) 
+            if ((*it)->arraySizes.find(name) != (*it)->arraySizes.end()) 
                 return (*it)->arraySizes[name];
-            }
-        }
         return blockStack.back()->arraySizes[name];
     }
 
