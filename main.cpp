@@ -28,9 +28,8 @@ int main(int argc, char **argv)
         std::cout << j.dump(4) << std::endl;
 
         CodeGenContext context;
-
-  //       (*mainBlock).setllvmContext(&context.llvmContext);
-     //   (*mainBlock).llvmContext=&context.llvmContext;
+//(*mainBlock).setllvmContext(&context.llvmContext);
+//(*mainBlock).llvmContext=&context.llvmContext;
 
         context.generateCode(*mainBlock);
 

@@ -73,10 +73,22 @@
                                     "name": "NVariableDeclaration"
                                 },
                                 {
+                                    "name": "NExpression:15"
+                                },
+                                {
+                                    "name": "NExpression:5"
+                                },
+                                {
                                     "name": "NExpression:1"
                                 },
                                 {
-                                    "name": "NExpression:2"
+                                    "name": "NExpression:6"
+                                },
+                                {
+                                    "name": "NExpression:9"
+                                },
+                                {
+                                    "name": "NExpression:8"
                                 },
                                 {
                                     "name": "NExpression:3"
@@ -85,50 +97,19 @@
                                     "name": "NExpression:4"
                                 },
                                 {
-                                    "name": "NExpression:5"
-                                },
-                                {
                                     "name": "NExpression:6"
-                                },
-                                {
-                                    "name": "NExpression:7"
-                                },
-                                {
-                                    "name": "NExpression:8"
-                                },
-                                {
-                                    "name": "NExpression:9"
                                 },
                                 {
                                     "name": "NExpression:10"
                                 },
                                 {
-                                    "name": "NExpression:11"
+                                    "name": "NExpression:7"
                                 },
                                 {
-                                    "name": "NExpression:12"
+                                    "name": "NExpression:11"
                                 }
                             ],
                             "name": "NArrayInitialization"
-                        },
-                        {
-                            "children": [
-                                {
-                                    "children": [
-                                        {
-                                            "name": "NExpression:3"
-                                        },
-                                        {
-                                            "name": "NExpression:4"
-                                        }
-                                    ],
-                                    "name": "NIdentifier:int(Array)"
-                                },
-                                {
-                                    "name": "NIdentifier:arr2"
-                                }
-                            ],
-                            "name": "NVariableDeclaration"
                         },
                         {
                             "children": [
@@ -155,6 +136,17 @@
                         {
                             "children": [
                                 {
+                                    "name": "NIdentifier:int"
+                                },
+                                {
+                                    "name": "NIdentifier:temp"
+                                }
+                            ],
+                            "name": "NVariableDeclaration"
+                        },
+                        {
+                            "children": [
+                                {
                                     "children": [
                                         {
                                             "name": "NIdentifier:i"
@@ -171,7 +163,7 @@
                                             "name": "NIdentifier:i"
                                         },
                                         {
-                                            "name": "NExpression:3"
+                                            "name": "NExpression:12"
                                         }
                                     ],
                                     "name": "NBinaryOperator:271"
@@ -217,7 +209,7 @@
                                             "name": "NIdentifier:i"
                                         },
                                         {
-                                            "name": "NExpression:3"
+                                            "name": "NExpression:12"
                                         }
                                     ],
                                     "name": "NBinaryOperator:271"

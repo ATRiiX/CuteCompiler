@@ -11,11 +11,11 @@ g++ -o system_test system_test.cpp
 using namespace std;
 using string=std::string;
 int main(int argc, char **argv) {
-    string command = "clang++ -O3 -o";
-    string inputfilename = "output.o";
-    string outputfilename = "test";
+    string cmd = "clang++ -O3 -o";
+    string inputfile = "output.o";
+    string outputfile = "test";
     string tab="    ";
-    system((command+tab+outputfilename+tab+inputfilename).c_str());
+    system((cmd+tab+outputfile+tab+inputfile).c_str());
    // system("clang++ -O3  output.o -o test ");
     return 0;
 }

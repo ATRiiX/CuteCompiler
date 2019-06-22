@@ -48,20 +48,20 @@ using legacy::PassManager;
 static Type *
 TypeOf(const NIdentifier &type, CodeGenContext &context)
 {
-    return context.typeSystem.getVarType(type);
+    return context.typeSystem.getVar(type);
 }
 
-static Value *CastToBoolean(CodeGenContext &context, Value *temp_Value)
+static Value *CastBoolean(CodeGenContext &context, Value *temp_Value)
 {
     auto id = temp_Value->getType()->getTypeID();
     switch (id)
     {
-    case (Type::IntegerTyID):
+    case (Type::IntegerTypeID):
     {
         temp_Value = context.builder.CreateIntCast(temp_Value, Type::getInt1Ty(context.llvmContext), true);
         return context.builder.CreateICmpNE(temp_Value, ConstantInt::get(Type::getInt1Ty(context.llvmContext), 0, true));
     }
-    case (Type::DoubleTyID):
+    case (Type::DoubleTypeID):
     {
         return context.builder.CreateFCmpONE(temp_Value, ConstantFP::get(context.llvmContext, APFloat(0.0)));
     }
@@ -71,7 +71,7 @@ static Value *CastToBoolean(CodeGenContext &context, Value *temp_Value)
 
 }
 
-static llvm::Value *calcArrayIndex(shared_ptr<NArrayIndex> index, CodeGenContext &context)
+static llvm::Value *calcIndex(shared_ptr<NArrayIndex> index, CodeGenContext &context)
 {
     auto sizeVec = context.getArraySize(index->arrayName->name);
     if (!(sizeVec.size() > 0 && sizeVec.size() == index->expressions->size()))
@@ -142,12 +142,10 @@ llvm::Value *NAssignment::codeGen(CodeGenContext &context)
     auto dstType = context.getSymbolType(this->lhs->name);
     string dstTypeStr = dstType->name;
     if (!dst)
-    {
         throw std::logic_error("Undeclared variable");
-    }
     Value *exp = exp = this->rhs->codeGen(context);
 
-    exp = context.typeSystem.cast(exp, context.typeSystem.getVarType(dstTypeStr), context.currentBlock());
+    exp = context.typeSystem.cast(exp, context.typeSystem.getVar(dstTypeStr), context.currentBlock());
     context.builder.CreateStore(exp, dst);
     return dst;
 }
@@ -159,16 +157,13 @@ llvm::Value *NBinaryOperator::codeGen(CodeGenContext &context)
     auto *R = this->rhs->codeGen(context);
     bool fp = false;
 
-    if ((L->getType()->getTypeID() == Type::DoubleTyID) ||
-        (R->getType()->getTypeID() == Type::DoubleTyID))
-    { // type upgrade cast
+    if ((L->getType()->getTypeID() == Type::DoubleTypeID) ||
+        (R->getType()->getTypeID() == Type::DoubleTypeID))
+     // type upgrade cast
         fp = true;
-    }
 
     if (!L || !R)
-    {
         return nullptr;
-    }
 
     switch (this->op)
     {
@@ -221,9 +216,7 @@ llvm::Value *NBlock::codeGen(CodeGenContext &context)
     cout << "Generating block" << endl;
     Value *last = nullptr;
     for (auto it = this->statements->begin(); it != this->statements->end(); it++)
-    {
         last = (*it)->codeGen(context);
-    }
     return last;
 }
 
@@ -276,7 +269,7 @@ llvm::Value *NFunctionDeclaration::codeGen(CodeGenContext &context)
     {
         if (arg->type->isArray)
         {
-            argTypes.push_back(PointerType::get(context.typeSystem.getVarType(arg->type->name), 0));
+            argTypes.push_back(PointerType::get(context.typeSystem.getVar(arg->type->name), 0));
         }
         else
         {
@@ -285,7 +278,7 @@ llvm::Value *NFunctionDeclaration::codeGen(CodeGenContext &context)
     }
     Type *retType = nullptr;
     if (this->type->isArray)
-        retType = PointerType::get(context.typeSystem.getVarType(this->type->name), 0);
+        retType = PointerType::get(context.typeSystem.getVar(this->type->name), 0);
     else
         retType = TypeOf(*this->type, context);
 
@@ -309,7 +302,7 @@ llvm::Value *NFunctionDeclaration::codeGen(CodeGenContext &context)
             Value *argAlloc;
             if ((*origin_arg)->type->isArray)
                 argAlloc = context.builder.CreateAlloca(
-                    PointerType::get(context.typeSystem.getVarType((*origin_arg)->type->name), 0));
+                    PointerType::get(context.typeSystem.getVar((*origin_arg)->type->name), 0));
             else
                 argAlloc = (*origin_arg)->codeGen(context);
 
@@ -383,7 +376,7 @@ llvm::Value *NVariableDeclaration::codeGen(CodeGenContext &context)
 
         context.setArraySize(this->id->name, arraySizes);
         Value *arraySizeValue = NInteger(arraySize).codeGen(context);
-        auto arrayType = ArrayType::get(context.typeSystem.getVarType(this->type->name), arraySize);
+        auto arrayType = ArrayType::get(context.typeSystem.getVar(this->type->name), arraySize);
         inst = context.builder.CreateAlloca(arrayType, arraySizeValue, "arraytmp");
     }
     else
@@ -419,7 +412,7 @@ llvm::Value *NIfStatement::codeGen(CodeGenContext &context)
     if (!temp_Value)
         return nullptr;
 
-    temp_Value = CastToBoolean(context, temp_Value);
+    temp_Value = CastBoolean(context, temp_Value);
 
     Function *theFunction = context.builder.GetInsertBlock()->getParent(); // the function where if statement is in
 
@@ -487,7 +480,7 @@ llvm::Value *NForStatement::codeGen(CodeGenContext &context)
     if (!temp_Value)
         return nullptr;
 
-    temp_Value = CastToBoolean(context, temp_Value);
+    temp_Value = CastBoolean(context, temp_Value);
 
     context.builder.CreateCondBr(temp_Value, block, after);
 
@@ -505,7 +498,7 @@ llvm::Value *NForStatement::codeGen(CodeGenContext &context)
     }
 
     temp_Value = this->condition->codeGen(context);
-    temp_Value = CastToBoolean(context, temp_Value);
+    temp_Value = CastBoolean(context, temp_Value);
     context.builder.CreateCondBr(temp_Value, block, after);
 
     theFunction->getBasicBlockList().push_back(after);
@@ -526,7 +519,7 @@ llvm::Value *NArrayIndex::codeGen(CodeGenContext &context)
         throw std::invalid_argument("type.isArray is false");
     }
 
-    auto value = calcArrayIndex(make_shared<NArrayIndex>(*this), context);
+    auto value = calcIndex(make_shared<NArrayIndex>(*this), context);
     ArrayRef<Value *> indices;
     if (context.isFuncArg(this->arrayName->name))
     {
@@ -564,7 +557,7 @@ llvm::Value *NArrayAssignment::codeGen(CodeGenContext &context)
         throw std::logic_error("The variable is not array");
     }
 
-    auto index = calcArrayIndex(arrayIndex, context);
+    auto index = calcIndex(arrayIndex, context);
     ArrayRef<Value *> gep2_array{ConstantInt::get(Type::getInt64Ty(context.llvmContext), 0), index};
     auto ptr = context.builder.CreateInBoundsGEP(varPtr, gep2_array, "elementPtr");
 

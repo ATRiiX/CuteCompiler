@@ -24,8 +24,8 @@ using namespace llvm;
 
 void ObjGenerate(CodeGenContext &context)
 {
-    const string filename = "output.o";
-    ObjGenerate(context, filename);
+    const string file = "output.o";
+    ObjGenerate(context, file);
 }
 /*
 rm test system_test
@@ -33,19 +33,19 @@ g++ -o system_test system_test.cpp
 ./system_test
 ./test
 */
-void system_call_clang(string inputfilename, string outputfilename)
+void syscall(string inputfile, string outputfile)
 {
 
     string clang = "clang++ -O3 -o";
-    //   string inputfilename = "output.o";
-    //   string outputfilename = "test";
+    //   string inputfile = "output.o";
+    //   string outputfile = "test";
     string tab = "  ";
-    string command = clang + tab + outputfilename + tab + inputfilename;
-    cout << "run command:  " << command << endl;
-    system(command.c_str());
+    string cmd = clang + tab + outputfile + tab + inputfile;
+    cout << "run cmd:  " << cmd << endl;
+    system(cmd.c_str());
     // system("clang++ -O3  output.o -o test ");
 }
-void ObjGenerate(CodeGenContext &context, string filename)
+void ObjGenerate(CodeGenContext &context, string file)
 {
 
     outs() << "Object code start generate "
@@ -79,7 +79,7 @@ void ObjGenerate(CodeGenContext &context, string filename)
     context.myModule->setTargetTriple(targetTriple);
 
     std::error_code EC;
-    raw_fd_ostream dest(filename.c_str(), EC, sys::fs::F_None);
+    raw_fd_ostream dest(file.c_str(), EC, sys::fs::F_None);
 
     legacy::PassManager pass;
     auto fileType = TargetMachine::CGFT_ObjectFile;
@@ -92,11 +92,11 @@ void ObjGenerate(CodeGenContext &context, string filename)
     pass.run(*context.myModule.get());
     dest.flush();
 
-    outs() << "Object code wrote to " << filename.c_str() << "\n";
+    outs() << "Object code wrote to " << file.c_str() << "\n";
 
     llvm_shutdown();
 
-    system_call_clang(filename, "test");
+    syscall(file, "test");
 
     return;
 }

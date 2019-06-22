@@ -44,11 +44,11 @@ public:
 
 
 
-    Type *getVarType(const NIdentifier &type);
+    Type *getVar(const NIdentifier &type);
 
-    Type *getVarType(string typeStr);
+    Type *getVar(string typeStr);
 
-    Value *getDefaultValue(string typeStr, LLVMContext &context);
+    Value *getValue(string typeStr, LLVMContext &context);
 
     Value *cast(Value *value, Type *type, BasicBlock *block);
 

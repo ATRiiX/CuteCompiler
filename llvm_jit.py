@@ -24,7 +24,7 @@ llvm_ir = """
    """
 llvm_ir2="""
 ; ModuleID = 'main'
-source_filename = "main"
+source_file = "main"
 
 define i32 @main() {
 entry:

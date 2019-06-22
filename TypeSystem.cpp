@@ -15,21 +15,21 @@ string TypeSystem::llvmTypeToStr(Type *value)
     switch (value->getTypeID())
     {
     case 0: ///<  0: type with no size
-        return "VoidTyID";
+        return "VoidTypeID";
     case 1: ///<  1: 16-bit floating point type
-        return "HalfTyID";
+        return "HalfTypeID";
     case 3: ///<  3: 64-bit floating point type
-        return "DoubleTyID";
+        return "DoubleTypeID";
     case 11: ///< 11: Arbitrary bit width integers
-        return "IntegerTyID";
+        return "IntegerTypeID";
     case 12: ///< 12: Functions
-        return "FunctionTyID";
+        return "FunctionTypeID";
     case 14: ///< 14: Arrays
-        return "ArrayTyID";
+        return "ArrayTypeID";
     case 15: ///< 15: Pointers
-        return "PointerTyID";
+        return "PointerTypeID";
     case 16: ///< 16: SIMD 'packed' format, or other vector type
-        return "VectorTyID";
+        return "VectorTypeID";
     default:
         throw std::invalid_argument("Unknown typeID in func llvmTypeToStr");
     }
@@ -45,14 +45,11 @@ string TypeSystem::llvmTypeToStr(Value *value)
 
 TypeSystem::TypeSystem(LLVMContext &context) : llvmContext(context)
 {
-    // Cast operators ...
-    // NOTE: The order matters here because CastInst::isEliminableCastPair
-    // NOTE: (see Instructions.cpp) encodes a table based on this ordering.
     addCast(intTy, doubleTy, llvm::CastInst::SIToFP);
     addCast(boolTy, doubleTy, llvm::CastInst::SIToFP);
 }
 
-Type *TypeSystem::getVarType(const NIdentifier &type)
+Type *TypeSystem::getVar(const NIdentifier &type)
 {
     if (type.isType == false)
     {
@@ -60,17 +57,17 @@ Type *TypeSystem::getVarType(const NIdentifier &type)
     }
     if (type.isArray)
     {
-        return PointerType::get(getVarType(type.name), 0);
+        return PointerType::get(getVar(type.name), 0);
     }
 
-    return getVarType(type.name);
+    return getVar(type.name);
 
     return 0;
 }
 
-Value *TypeSystem::getDefaultValue(string typeStr, LLVMContext &context)
+Value *TypeSystem::getValue(string typeStr, LLVMContext &context)
 {
-    Type *type = this->getVarType(typeStr);
+    Type *type = this->getVar(typeStr);
     if (type == this->intTy)
     {
         return ConstantInt::get(type, 0, true);
@@ -109,27 +106,27 @@ Value *TypeSystem::cast(Value *value, Type *type, BasicBlock *block)
 
     return CastInst::Create(_castTable[from][type], value, type, "cast", block);
 }
-constexpr unsigned int str2int(const char *str, int h = 0)
+constexpr unsigned int stringToInt(const char *str, int h = 0)
 {
-    return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
+    return !str[h] ? 5381 : (stringToInt(str, h + 1) * 33) ^ str[h];
 }
 
-Type *TypeSystem::getVarType(string typeStr)
+Type *TypeSystem::getVar(string typeStr)
 {
 
-    switch (str2int(typeStr.c_str()))
+    switch (stringToInt(typeStr.c_str()))
     {
-    case str2int("void"):
+    case stringToInt("void"):
         return this->voidTy;
-    case str2int("string"):
+    case stringToInt("string"):
         return this->stringTy;
-    case str2int("int"):
+    case stringToInt("int"):
         return this->intTy;
-    case str2int("double"):
+    case stringToInt("double"):
         return this->doubleTy;
-    case str2int("bool"):
+    case stringToInt("bool"):
         return this->boolTy;
-    case str2int("char"):
+    case stringToInt("char"):
         return this->charTy;
 
     default:
