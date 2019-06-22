@@ -67,7 +67,6 @@ public:
     }
 
     bool isFuncArg(string name) const {
-
         for (auto it = blockStack.rbegin(); it != blockStack.rend(); it++) {
             if ((*it)->isFuncArg.find(name) != (*it)->isFuncArg.end()) {
                 return (*it)->isFuncArg[name];

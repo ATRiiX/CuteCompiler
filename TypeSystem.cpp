@@ -119,21 +119,19 @@ Type *TypeSystem::getVarType(string typeStr)
 
     switch (str2int(typeStr.c_str()))
     {
-    case str2int("int"):
-        return this->intTy;
-    case str2int("double"):
-        return this->doubleTy;
-
-    case str2int("bool"):
-        return this->boolTy;
-
-    case str2int("char"):
-        return this->charTy;
-
     case str2int("void"):
         return this->voidTy;
     case str2int("string"):
         return this->stringTy;
+    case str2int("int"):
+        return this->intTy;
+    case str2int("double"):
+        return this->doubleTy;
+    case str2int("bool"):
+        return this->boolTy;
+    case str2int("char"):
+        return this->charTy;
+
     default:
         return nullptr;
     }

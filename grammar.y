@@ -135,7 +135,7 @@ assign : ident TEQUAL expr { $$ = new NAssignment(shared_ptr<NIdentifier>($1), s
 
 			;
 
-call_args : /* blank */ { $$ = new ExpressionList(); }
+call_args : { $$ = new ExpressionList(); }
 					| expr { $$ = new ExpressionList(); $$->push_back(shared_ptr<NExpression>($1)); }
 					| call_args TCOMMA expr { $1->push_back(shared_ptr<NExpression>($3)); }
 comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE

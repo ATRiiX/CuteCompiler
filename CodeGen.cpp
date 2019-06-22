@@ -44,7 +44,6 @@
 #include <stdexcept>
 #include <llvm/IR/LLVMContext.h>
 using legacy::PassManager;
-#define ISTYPE(value, id) (value->getType()->getTypeID() == id)
 
 static Type *
 TypeOf(const NIdentifier &type, CodeGenContext &context)
@@ -54,31 +53,32 @@ TypeOf(const NIdentifier &type, CodeGenContext &context)
 
 static Value *CastToBoolean(CodeGenContext &context, Value *temp_Value)
 {
-
-    if (ISTYPE(temp_Value, Type::IntegerTyID))
+    auto id = temp_Value->getType()->getTypeID();
+    switch (id)
+    {
+    case (Type::IntegerTyID):
     {
         temp_Value = context.builder.CreateIntCast(temp_Value, Type::getInt1Ty(context.llvmContext), true);
         return context.builder.CreateICmpNE(temp_Value, ConstantInt::get(Type::getInt1Ty(context.llvmContext), 0, true));
     }
-    else if (ISTYPE(temp_Value, Type::DoubleTyID))
+    case (Type::DoubleTyID):
     {
         return context.builder.CreateFCmpONE(temp_Value, ConstantFP::get(context.llvmContext, APFloat(0.0)));
     }
-    else
-    {
+    default:
         return temp_Value;
     }
+
 }
 
 static llvm::Value *calcArrayIndex(shared_ptr<NArrayIndex> index, CodeGenContext &context)
 {
     auto sizeVec = context.getArraySize(index->arrayName->name);
-    cout << "sizeVec:" << sizeVec.size() << ", expressions: " << index->expressions->size() << endl;
     if (!(sizeVec.size() > 0 && sizeVec.size() == index->expressions->size()))
     {
         throw std::invalid_argument("!(sizeVec.size() > 0 && sizeVec.size() == index->expressions->size())");
     }
- 
+
     auto expression = *(index->expressions->rbegin());
 
     for (unsigned int i = sizeVec.size() - 1; i >= 1; i--)
@@ -137,7 +137,7 @@ void CodeGenContext::generateCode(NBlock &root)
 
 llvm::Value *NAssignment::codeGen(CodeGenContext &context)
 {
-    cout << "Generating assignment of " << this->lhs->name << " = " << endl;
+
     Value *dst = context.getSymbolValue(this->lhs->name);
     auto dstType = context.getSymbolType(this->lhs->name);
     string dstTypeStr = dstType->name;
@@ -147,9 +147,6 @@ llvm::Value *NAssignment::codeGen(CodeGenContext &context)
     }
     Value *exp = exp = this->rhs->codeGen(context);
 
-    cout << "dst typeid = " << TypeSystem::llvmTypeToStr(context.typeSystem.getVarType(dstTypeStr)) << endl;
-    cout << "exp typeid = " << TypeSystem::llvmTypeToStr(exp) << endl;
-
     exp = context.typeSystem.cast(exp, context.typeSystem.getVarType(dstTypeStr), context.currentBlock());
     context.builder.CreateStore(exp, dst);
     return dst;
@@ -157,8 +154,6 @@ llvm::Value *NAssignment::codeGen(CodeGenContext &context)
 
 llvm::Value *NBinaryOperator::codeGen(CodeGenContext &context)
 {
-
-    cout << "Generating binary operator" << endl;
 
     auto *L = this->lhs->codeGen(context);
     auto *R = this->rhs->codeGen(context);
@@ -174,9 +169,6 @@ llvm::Value *NBinaryOperator::codeGen(CodeGenContext &context)
     {
         return nullptr;
     }
-    cout << "fp = " << (fp ? "true" : "false") << endl;
-    cout << "L is " << TypeSystem::llvmTypeToStr(L) << endl;
-    cout << "R is " << TypeSystem::llvmTypeToStr(R) << endl;
 
     switch (this->op)
     {
@@ -260,8 +252,7 @@ llvm::Value *NIdentifier::codeGen(CodeGenContext &context)
         auto arrayPtr = context.builder.CreateLoad(value, "arrayPtr");
         if (arrayPtr->getType()->isArrayTy())
         {
-            cout << "(Array Type)" << endl;
-            //            arrayPtr->setAlignment(16);
+
             std::vector<Value *> indices;
             indices.push_back(ConstantInt::get(context.typeSystem.intTy, 0, false));
             auto ptr = context.builder.CreateInBoundsGEP(value, indices, "array Ptr");
@@ -343,8 +334,6 @@ llvm::Value *NFunctionDeclaration::codeGen(CodeGenContext &context)
 
     return function;
 }
-
-
 
 llvm::Value *NMethodCall::codeGen(CodeGenContext &context)
 {
@@ -458,14 +447,14 @@ llvm::Value *NIfStatement::codeGen(CodeGenContext &context)
     thenBB = context.builder.GetInsertBlock();
 
     if (thenBB->getTerminator() == nullptr)
-    { //
+    {
         context.builder.CreateBr(mergeBB);
     }
 
     if (this->falseBlock)
     {
-        theFunction->getBasicBlockList().push_back(falseBB); //
-        context.builder.SetInsertPoint(falseBB);             //
+        theFunction->getBasicBlockList().push_back(falseBB);
+        context.builder.SetInsertPoint(falseBB);
 
         context.pushBlock(thenBB);
 
@@ -476,8 +465,8 @@ llvm::Value *NIfStatement::codeGen(CodeGenContext &context)
         context.builder.CreateBr(mergeBB);
     }
 
-    theFunction->getBasicBlockList().push_back(mergeBB); //
-    context.builder.SetInsertPoint(mergeBB);             //
+    theFunction->getBasicBlockList().push_back(mergeBB);
+    context.builder.SetInsertPoint(mergeBB);
 
     return nullptr;
 }
@@ -500,7 +489,6 @@ llvm::Value *NForStatement::codeGen(CodeGenContext &context)
 
     temp_Value = CastToBoolean(context, temp_Value);
 
-    // fall to the block
     context.builder.CreateCondBr(temp_Value, block, after);
 
     context.builder.SetInsertPoint(block);
@@ -511,27 +499,20 @@ llvm::Value *NForStatement::codeGen(CodeGenContext &context)
 
     context.popBlock();
 
-    // do increment
     if (this->increment)
     {
         this->increment->codeGen(context);
     }
 
-    // execute the again or stop
     temp_Value = this->condition->codeGen(context);
     temp_Value = CastToBoolean(context, temp_Value);
     context.builder.CreateCondBr(temp_Value, block, after);
 
-    // insert the after block
     theFunction->getBasicBlockList().push_back(after);
     context.builder.SetInsertPoint(after);
 
     return nullptr;
 }
-
-
-
-
 
 llvm::Value *NArrayIndex::codeGen(CodeGenContext &context)
 {
@@ -569,7 +550,6 @@ llvm::Value *NArrayIndex::codeGen(CodeGenContext &context)
 
 llvm::Value *NArrayAssignment::codeGen(CodeGenContext &context)
 {
-    cout << "Generating array index assignment of " << this->arrayIndex->arrayName->name << endl;
     auto varPtr = context.getSymbolValue(this->arrayIndex->arrayName->name);
 
     if (varPtr == nullptr)
@@ -578,15 +558,13 @@ llvm::Value *NArrayAssignment::codeGen(CodeGenContext &context)
     }
 
     auto arrayPtr = context.builder.CreateLoad(varPtr, "arrayPtr");
-    //    arrayPtr->setAlignment(16);
 
     if (!arrayPtr->getType()->isArrayTy() && !arrayPtr->getType()->isPointerTy())
     {
         throw std::logic_error("The variable is not array");
     }
-    //    std::vector<Value*> indices;
+
     auto index = calcArrayIndex(arrayIndex, context);
-    //    cout << "here2" << endl;
     ArrayRef<Value *> gep2_array{ConstantInt::get(Type::getInt64Ty(context.llvmContext), 0), index};
     auto ptr = context.builder.CreateInBoundsGEP(varPtr, gep2_array, "elementPtr");
 
@@ -595,18 +573,18 @@ llvm::Value *NArrayAssignment::codeGen(CodeGenContext &context)
 
 llvm::Value *NArrayInitialization::codeGen(CodeGenContext &context)
 {
-    cout << "Generating array initialization of " << this->declaration->id->name << endl;
+
     auto arrayPtr = this->declaration->codeGen(context);
     auto sizeVec = context.getArraySize(this->declaration->id->name);
 
-    if(sizeVec.size() != 1){
+    if (sizeVec.size() != 1)
+    {
         throw std::invalid_argument("sizeVec.size is not 1");
     }
 
     for (int index = 0; index < this->expressionList->size(); index++)
     {
         shared_ptr<NInteger> indexValue = make_shared<NInteger>(index);
-
         shared_ptr<NArrayIndex> arrayIndex = make_shared<NArrayIndex>(this->declaration->id, indexValue);
         NArrayAssignment assignment(arrayIndex, this->expressionList->at(index));
         assignment.codeGen(context);
